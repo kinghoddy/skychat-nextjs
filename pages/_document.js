@@ -1,55 +1,38 @@
 import Document, { Head, Main, NextScript } from "next/document";
-
 export default class MyDocument extends Document {
+  static async getInitialProps(ctx) {
+    const initialProps = await Document.getInitialProps(ctx)
+    return { ...initialProps }
+  }
   render() {
     return (
       <html>
         <Head>
           <meta name="author" content="Sogbuyi Noel Odunmilade" />
           <meta name="keywords" content="skychat kinghoddy sky-chat" />
-          <meta name="theme-color" content="#222" />
+          <meta name="msapplication-TileColor" content="#ffa600" />
+          <meta name="msapplication-TileImage" content="/img/logo/logo_red.png" />
+          <meta name="theme-color" content="#ffffff" />
           <link rel="stylesheet" href="/css/bootstrap.min.css" />
           <link rel="stylesheet" href="/index.css" />
           <link rel="stylesheet" href="/css/animate.min.css" />
           <link rel="stylesheet" href="/fontawesome/css/fontawesome.min.css" />
           <link rel="stylesheet" href="/fontawesome/css/all.min.css" />
           <link rel="stylesheet" href="/iconfont/material-icons.css" />
-          <link
-            rel="stylesheet"
-            href="/device-mockups/device-mockups.min.css"
-          />
-
+          <link rel="manifest" href="/manifest.json" />
           <script src="/js/jquery.js"></script>
           <script src="/js/bootstrap.min.js"></script>
           <script src="/js/wow.min.js"></script>
           <link
-            href="https://fonts.googleapis.com/css?family=Montserrat:400,700"
+            href="https://fonts.googleapis.com/css?family=Architects+Daughter|Gochi+Hand|Montserrat+Alternates:200,300,400,500,700,800|Source+Sans+Pro&display=swap"
             rel="stylesheet"
-            type="text/css"
-          />
-          <link
-            href="https://fonts.googleapis.com/css?family=Kaushan+Script"
-            rel="stylesheet"
-            type="text/css"
-          />
-          <link
-            href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic,700italic"
-            rel="stylesheet"
-            type="text/css"
-          />
-          <link
-            href="https://fonts.googleapis.com/css?family=Roboto+Slab:400,100,300,700"
-            rel="stylesheet"
-            type="text/css"
           />
         </Head>
         <body>
           <Main />
-
           <NextScript />
         </body>
         <script src="/js/main.js"></script>
-        <script async src="https://static.addtoany.com/menu/page.js"></script>
       </html>
     );
   }

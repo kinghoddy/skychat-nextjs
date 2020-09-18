@@ -9,12 +9,14 @@ import Router from "next/router";
 class SignUp extends Component {
   state = {
     formData: {
+      fullName: '',
       username: "",
       email: "",
       password: "",
     },
     profilePicture: "",
     errorMessage: null,
+    setname: false,
     sMessage: "Please Wait ! ! !",
     loading: false,
     usernameExists: false,
@@ -23,6 +25,7 @@ class SignUp extends Component {
   inputChanged = (e, types) => {
     const form = { ...this.state.formData };
     form[types] = e.target.value;
+    if (types == 'username') form[types] = sanitize(e.target.value)
     this.setState({ formData: form });
   };
   googleLogin = () => {
@@ -73,56 +76,63 @@ class SignUp extends Component {
         this.setState({ errorMessage: errorMessage, loading: false });
       });
   };
-  saveUser = () => {
-    this.setState({ loading: true, sMessage: "Completing Signup  !" });
-    const user = firebase.auth().currentUser;
-    user.updateProfile({
-      displayName: this.state.formData.username,
-    });
-    var ref = firebase.database().ref("users/");
-    ref.once("value", (s) => {
-      const id = user.uid;
-      ref
-        .child(id)
-        .set({
-          username: this.state.formData.username.toLowerCase(),
-          profilePicture: user.photoURL,
-        })
-        .then(() => {
-          var search = Router.query.route;
-          if (search) {
-            Router.push("/" + search);
-          } else {
-            Router.push("/feed");
-          }
-        })
-        .catch(() => {
-          this.setState({
-            loading: false,
-            errorMessage: "Failed to save user to database",
+  saveUser = (e) => {
+    e.preventDefault();
+    // this.setUserName(this.state.formData.username);
+    this.setState({ errorMessage: null })
+    if (!this.state.usernameExists && this.state.formData.username && this.state.formData.fullName) {
+
+      this.setState({ loading: true, sMessage: "Completing Signup  !" });
+      const user = firebase.auth().currentUser;
+      user.updateProfile({
+        displayName: this.state.formData.username,
+      });
+      var ref = firebase.database().ref("users/");
+      ref.once("value", (s) => {
+        const id = user.uid;
+        ref
+          .child(id)
+          .update({
+            username: this.state.formData.username,
+            profilePicture: user.photoURL,
+            coverPhoto: '/img/avatar-square.png',
+            fullName: this.state.formData.fullName.toLowerCase()
+          })
+          .then(() => {
+            localStorage.removeItem('skychatUserData');
+            localStorage.removeItem("skychatFeed");
+            var search = Router.query.route;
+            setTimeout(() => {
+              if (search) {
+                Router.push("/" + search);
+              } else {
+                Router.push("/feed");
+              }
+            }, 2000)
+          })
+          .catch(() => {
+            this.setState({
+              loading: false,
+              errorMessage: "Failed to save user to database",
+            });
           });
-        });
-    });
+      });
+    }
+    if (this.state.usernameExists) {
+      this.setState({ errorMessage: 'Username Exists. Pick another' })
+    }
   };
-  setUserName = (name) => {
-    if (!name) name = "";
+  setUserName = () => {
+    let userExists
     this.setState({ nameLoading: true });
     var ref = firebase.database().ref("users/");
-    ref.on("value", (s) => {
-      let userExists = false;
-      for (let keys in s.val()) {
-        if (
-          s.val()[keys].username.toLowerCase().trim() ===
-          name.toLowerCase().trim()
-        ) {
-          userExists = true;
-        }
-      }
-      this.setState({ usernameExists: userExists, nameLoading: false });
-      if (userExists) {
-      } else {
-      }
-    });
+    setTimeout(() => {
+      ref.orderByChild('username').equalTo(this.state.formData.username).once('value', s => {
+        if (s.val()) userExists = true;
+        else userExists = false
+        this.setState({ usernameExists: userExists, nameLoading: false });
+      });
+    }, 500)
   };
   signUpHandler = (event) => {
     event.preventDefault();
@@ -182,25 +192,37 @@ class SignUp extends Component {
                 '=' or any other non alphabetic character.
               </span>
             </div>
-            <form action="#" className="d-flex">
-              {this.state.nameLoading && (
-                <div
-                  style={{ height: "20px", width: "20px" }}
-                  className="text-primary spinner-border"
-                ></div>
-              )}
+            <form onSubmit={this.saveUser}>
+              <div className="d-flex align-items-center" >
+
+                {this.state.nameLoading ? (
+                  <div
+                    style={{ height: "20px", width: "20px" }}
+                    className="text-primary spinner-border mr-2"
+                  ></div>
+                ) : this.state.formData.username && <i className={"mr-2 fal fa-2x " + (this.state.usernameExists ? 'fa-times text-danger' : 'fa-check text-success')} />}
+
+                <input
+                  onChange={(e) => {
+                    this.setUserName();
+                    this.inputChanged(e, "username");
+                  }}
+                  value={this.state.formData.username}
+                  required
+                  minLength="4"
+                  placeholder="username"
+                />
+              </div>
               <input
-                onChange={(e) => {
-                  this.setUserName(e.target.value);
-                  this.inputChanged(e, "username");
-                }}
-                value={this.state.formData.username}
+                type="text"
+                onChange={(e) => this.inputChanged(e, "fullName")}
+                value={this.state.formData.fullName}
+                minLength="4"
                 required
-                placeholder="username"
+                placeholder="Full name"
               />
-              {!this.state.usernameExists && this.state.formData.username && (
+              {!this.state.usernameExists && this.state.formData.username && this.state.formData.fullName && (
                 <button
-                  onClick={this.saveUser}
                   className="btn btn-login text-light"
                 >
                   Finish
@@ -209,34 +231,35 @@ class SignUp extends Component {
             </form>
           </React.Fragment>
         ) : (
-          <form onSubmit={this.signUpHandler}>
-            <input
-              type="email"
-              onChange={(e) => this.inputChanged(e, "email")}
-              value={this.state.formData.email}
-              required
-              placeholder="Email address"
-            />
-            <input
-              type="password"
-              onChange={(e) => this.inputChanged(e, "password")}
-              value={this.state.formData.password}
-              required
-              placeholder="Password"
-            />
-            <div className="d-flex justify-content-between align-items-center">
-              <div>
-                Already have an account ?
+            <form onSubmit={this.signUpHandler}>
+
+              <input
+                type="email"
+                onChange={(e) => this.inputChanged(e, "email")}
+                value={this.state.formData.email}
+                required
+                placeholder="Email address"
+              />
+              <input
+                type="password"
+                onChange={(e) => this.inputChanged(e, "password")}
+                value={this.state.formData.password}
+                required
+                placeholder="Password"
+              />
+              <div className="d-flex justify-content-between align-items-center">
+                <div>
+                  Already have an account ?
                 <Link href="/login">
-                  <a>Login</a>
-                </Link>
+                    <a>Login</a>
+                  </Link>
+                </div>
+                <button className="text-light btn btn-login px-4">
+                  Next <i className="fal fa-arrow-right"></i>
+                </button>
               </div>
-              <button className="text-light btn btn-login px-4">
-                Next <i className="fal fa-arrow-right"></i>
-              </button>
-            </div>
-          </form>
-        )}
+            </form>
+          )}
         {!this.state.setname && (
           <div className="mt-3">
             <h6 className="px-2">You can also login with google</h6>
@@ -270,6 +293,9 @@ class SignUp extends Component {
                 margin-bottom : 20px;
                 background : none;
             }
+            form input:focus {
+                border-bottom : 2px solid #f20;
+            }
             .btn-login {
                 background : linear-gradient(to right , orange , red);
                 color : white;
@@ -300,6 +326,11 @@ class SignUp extends Component {
       </Layout>
     );
   }
+}
+
+const sanitize = (text = '') => {
+  let sanitizedText = text.replace(/[-[\]{}();:'"@=<>*+?.,\\^$|#\s]/g, '').trim().toLowerCase();
+  return sanitizedText
 }
 
 export default SignUp;

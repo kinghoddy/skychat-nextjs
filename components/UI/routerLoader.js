@@ -7,7 +7,6 @@ export default (props) => {
   const [routerWidth, setRouterWidth] = useState(2);
   useEffect(() => {
     router.events.on("routeChangeStart", () => {
-      console.log("change start", routerWidth);
       setRouting(true);
       setTimeout(() => {
         setRouterWidth(15);
@@ -19,9 +18,14 @@ export default (props) => {
         setRouterWidth(98);
       }, 800);
     });
-    router.events.on("routeChangeStart", () => {
-      console.log("change end");
+    router.events.on('routeChangeComplete', () => {
+      setTimeout(() => {
+        setRouterWidth(1008);
+        setRouting(false)
+      }, 800);
     });
+
+
   }, []);
   return (
     routing && (
@@ -37,7 +41,7 @@ export default (props) => {
             height: 100vh;
             width: 100vw;
             z-index: 5000;
-            background: #ffffffcc;
+            background: ${props.noShow ? 'none' : '#ffffffcc'};
           }
           .routing-progress {
             background: linear-gradient(to right, red, orange);

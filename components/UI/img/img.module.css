@@ -1,0 +1,39 @@
+.wrapper {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  height: 100%;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+.noImg {
+  color: var(--dark);
+  text-transform: capitalize;
+}
+.wrapper img {
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: 0.5s 0.5s;
+}
+.visible {
+  opacity: 1 !important;
+}
+
+.preload {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background-color: var(--light);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.preload > * {
+  height: 20px;
+  width: 20px;
+}

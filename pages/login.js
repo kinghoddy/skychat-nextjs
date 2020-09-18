@@ -30,7 +30,6 @@ class Login extends React.Component {
       .then((result) => {
         this.setState({ errorMessage: null, loading: false });
         var user = result.user;
-        console.log(result);
         if (result.additionalUserInfo.isNewUser === true) {
           firebase
             .auth()
@@ -98,6 +97,8 @@ class Login extends React.Component {
       this.setState({ loading: false, error: error });
     }
     if (this.state.shouldLogin) {
+      localStorage.removeItem('skychatUserData');
+      localStorage.removeItem("skychatFeed");
       var search = Router.query.route;
       if (search) {
         Router.push("/" + search);
@@ -166,6 +167,9 @@ class Login extends React.Component {
                 border-bottom : 2px solid #f73;
                 margin-bottom : 20px;
                 background : none;
+            }
+            form input:focus {
+                border-bottom : 2px solid #fc3;
             }
             .btn-login {
                 background : linear-gradient(to right , orange , red);

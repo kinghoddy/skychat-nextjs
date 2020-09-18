@@ -1,6 +1,6 @@
 {
-  "name": "gppcr-beta",
-  "version": "0.1.0",
+  "name": "Skychat",
+  "version": "1.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",

@@ -1,0 +1,46 @@
+{
+  "background_color": "#ffa600",
+  "description": "the next social media hit",
+  "display": "standalone",
+  "icons": [
+    {
+      "src": "/img/logo/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/img/logo/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "name": "Skychat By King Hoddy",
+  "short_name": "Skychat",
+  "start_url": ".",
+  "shortcuts": [
+    {
+      "name": "Edit profile",
+      "short_name": "Edit Profile",
+      "description": "Edit the info viewed on your profile",
+      "url": "/menu/edit-profile",
+      "icons": [
+        {
+          "src": "/img/logo/icon-512.png",
+          "sizes": "512x512"
+        }
+      ]
+    },
+    {
+      "name": "Messages",
+      "short_name": "Skychat Messanger",
+      "description": "View all yyour messages",
+      "url": "/messages",
+      "icons": [
+        {
+          "src": "/img/logo/logo_blue.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ]
+}
