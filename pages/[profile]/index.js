@@ -8,8 +8,7 @@ import Friends from '../../components/ffriends/friendsGrid'
 import Info from '../../components/profileInfo';
 import Spinner from '../../components/UI/Spinner/Spinner';
 import Requests from '../../components/ffriends/requests';
-import Router from 'next/router'
-
+import AddPost from '../../components/forms/addPost';
 export default class Timeline extends React.Component {
     state = {
         userData: {
@@ -76,7 +75,7 @@ export default class Timeline extends React.Component {
         posts.sort((a, b) => {
             return b.date - a.date;
         });
-        return <Layout broken={this.state.broken} stay title={(this.props.d.username && this.props.d.username.toUpperCase()) + " | Skychat"} src={this.props.d.profilePicture} >
+        return <Layout broken={this.state.broken} stay title={(this.props.d.username !== undefined ? this.props.d.username.toUpperCase() : 'View profile') + " | Skychat"} src={this.props.d.profilePicture} >
 
 
             <div className="px-lg-1 pt-0 pt-lg-2 cover" >
@@ -94,13 +93,15 @@ export default class Timeline extends React.Component {
                         <div className="mb-2" >
                             <Friends {...this.props.d} />
                         </div>
-                        {this.state.isMine && <div className="mb-2" >
-                            <Requests {...this.props.d} />
-                        </div>}
+
                     </div>
 
                 </div>
-                {!this.state.loggedOut && <div className="col-md-7 px-md-1 order-lg-1 ">
+                <div className="col-md-7 px-md-1 order-lg-1 ">
+                    {this.state.isMine && <div className="mb-2" >
+                        <Requests {...this.props.d} />
+                    </div>}
+                    {this.state.isMine && <AddPost setUpload={this.props.setUpload} {...this.state.userData} />}
 
                     <div className="mb-2" >
                         <h5 className="bg-white mb-0 p-2" >Posts <small> {this.state.postsLength} </small> </h5>
@@ -113,7 +114,7 @@ export default class Timeline extends React.Component {
                         </div>
                     </div>
                 </div>
-                }
+
 
             </div>
             <style jsx>{`

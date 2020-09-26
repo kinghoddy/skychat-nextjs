@@ -40,7 +40,7 @@ export default (props) => {
             left: 0;
             height: 100vh;
             width: 100vw;
-            z-index: 5000;
+            z-index: 1900;
             background: ${props.noShow ? 'none' : '#ffffffcc'};
           }
           .routing-progress {

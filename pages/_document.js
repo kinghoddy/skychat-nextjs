@@ -13,22 +13,25 @@ export default class MyDocument extends Document {
           <meta name="msapplication-TileColor" content="#ffa600" />
           <meta name="msapplication-TileImage" content="/img/logo/logo_red.png" />
           <meta name="theme-color" content="#ffffff" />
+
           <link rel="stylesheet" href="/css/bootstrap.min.css" />
           <link rel="stylesheet" href="/index.css" />
           <link rel="stylesheet" href="/css/animate.min.css" />
           <link rel="stylesheet" href="/fontawesome/css/fontawesome.min.css" />
           <link rel="stylesheet" href="/fontawesome/css/all.min.css" />
           <link rel="stylesheet" href="/iconfont/material-icons.css" />
-          <link rel="manifest" href="/manifest.json" />
+          <meta name="google-site-verification" content="9vMTNI71ICLn3Vg-lD07eLxkPFM7fgdLxXLVp0ZOnEg" />          <link rel="manifest" href="/manifest.json" />
           <script src="/js/jquery.js"></script>
           <script src="/js/bootstrap.min.js"></script>
           <script src="/js/wow.min.js"></script>
           <link
             href="https://fonts.googleapis.com/css?family=Architects+Daughter|Gochi+Hand|Montserrat+Alternates:200,300,400,500,700,800|Source+Sans+Pro&display=swap"
             rel="stylesheet"
+
           />
+
         </Head>
-        <body>
+        <body >
           <Main />
           <NextScript />
         </body>

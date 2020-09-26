@@ -3,6 +3,7 @@ import 'firebase/messaging';
 import 'firebase/database';
 import 'firebase/auth'
 import * as serviceWorker from './serviceWorker';
+import theme from './getTheme';
 if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/firebase-messaging-sw.js')
         .then(function (registration) {
@@ -67,3 +68,5 @@ const checkConnection = (user) => {
         }
     });
 }
+
+theme.getTheme()

@@ -6,6 +6,9 @@
 }
 body {
   overflow-x: hidden;
+  color: var(--black);
+  scroll-behavior: smooth;
+  touch-action: pan-y;
 }
 
 ::-webkit-scrollbar {
@@ -26,24 +29,36 @@ body {
 p {
   line-height: 1.75;
 }
+
+.inLink {
+  font-weight: 400;
+  color: #2c7bbd;
+}
+body.dark .inLink {
+  color: #6cf;
+}
+body.dim .inLink {
+  color: #6cf;
+}
 a:hover {
   text-decoration: none !important;
 }
-
 .btn-fav {
   background: linear-gradient(to right, #f10, #ffa500);
-  color: #fff;
+  color: #fff !important;
+  white-space: nowrap;
   transition: all 0.3s;
 }
 .btn-fav:hover {
   background: linear-gradient(to right, #f50, #fc1);
-  color: #fff;
+  color: #fff !important;
 }
 
 h5,
 h4 {
   font-family: "Montserrat Alternates", sans-serif;
   font-weight: 600;
+  color: var(--black);
 }
 
 h3,
@@ -51,11 +66,13 @@ h2 {
   text-transform: capitalize;
   font-family: "Architects Daughter", cursive;
   font-weight: bolder;
+  color: var(--black);
 }
 
 h1 {
   font-family: "Gochi Hand", cursive;
   font-size: 38px;
+  color: var(--black);
 }
 
 ::-moz-selection {

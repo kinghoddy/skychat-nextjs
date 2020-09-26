@@ -7,7 +7,7 @@ const Broken = props => {
         <i className="icon fad fa-user-lock text-warning" />
         <h4>This Content Isn't Available Right Now</h4>
         <p>
-            When this happens, it's usually because the owner only shared it with a small group of people, changed who can see it or it's been deleted
+            When this happens, it's usually because you followed a broken link or the content has been deleted
         </p>
         <Link href="/feed">
             <a className="btn btn-fav" >Got to News Feed</a>

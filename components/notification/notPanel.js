@@ -28,7 +28,7 @@ export default function NotPanel(props) {
 
                 <h6 className="title" >{props.title}
                 </h6>
-                <p className="text" dangerouslySetInnerHTML={{ __html: props.text.substring(0, 30) + '...' }}></p>
+                <p className="text" dangerouslySetInnerHTML={{ __html: props.text ? props.text.substring(0, 30) + '...' : '' }}></p>
                 <span className="date" >{date(props.date, true)}</span>
                 {props.buttons && <div className="buttons" >
                     {props.buttons.map(cur => <button className="btn btn-primary" >{cur.text}</button>)}
@@ -62,7 +62,7 @@ export default function NotPanel(props) {
                 }
             }
                .con {
-                   background : var(--white);
+                   background : var(--gray);
                    border-radius : 3px;
                    box-shadow : 0 5px 10px #0003;
                    position : fixed;
@@ -96,7 +96,7 @@ export default function NotPanel(props) {
                }
                .date {
                    text-transform : lowercase;
-                   color : #0005;
+                   color : var(--dark);
                    font-weight : 600;
                    display : block;
                    font-size : 12px;

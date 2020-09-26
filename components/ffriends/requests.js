@@ -63,12 +63,12 @@ class Requests extends React.Component {
 
         //  sending not
         let n = {
-            title: this.props.username + ' Accepted Your Friend Request',
+            title: this.props.username + ' accepted your friend request',
             icon: this.props.profilePicture,
-            link: '/[profile]?profile=' + this.props.username,
+            link: '/' + this.props.username,
             date: Date.now()
         }
-        ref.child('notifications').push(n)
+        ref.child('notification').push(n)
     }
     getReqs(uid) {
         if (uid) {

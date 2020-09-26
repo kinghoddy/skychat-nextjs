@@ -41,10 +41,12 @@ const Send = props => {
                align-items : flex-end;
                min-height : 100%;
                padding : 10px;
+               width : 100%
            }
            .textForm {
                display : flex;
                flex : 1;
+               width : 100%;
                height :100%;
                align-items : flex-end;
             }
@@ -55,15 +57,17 @@ const Send = props => {
             font-size: 15px;
             position : relative;
             flex : 1;
-            background : var(--white);
+            max-width : calc(100% - 40px);
+            background : var(--light);
             align-self : stretch;
+            color : var(--black);
             border-radius : 30px;
             padding : 10px 20px;
             }
             .placeholder {
                 position:absolute;
                 top: 50%;
-                color : #0007;
+                color : var(--dark);
                 left :20px;
                 transform : translateY(-50%);
             } 
@@ -74,14 +78,17 @@ const Send = props => {
             .editor {
                 white-space : pre-line;
                 overflow-wrap : break-word; 
-                overflow : auto;
+                overflow-y : auto;
+                word-break:break-all;
+                overflow-x : hidden;
+                width : 100%;
                 max-height : 9rem;
             }
             .send {
                 align-items : center;
                 display : flex;
                 justify-content : center;
-               background : #0001;
+               background : #777;
                border-radius : 50%;
                height : 40px;
                width : 40px;
@@ -98,6 +105,12 @@ const Send = props => {
               color : inherit;
            }
 
+
+        `}</style>
+        <style jsx global>{`
+                  body.dim  .text {
+                       background: #62686a !important;
+                  }
         `}</style>
     </div>
 

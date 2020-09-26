@@ -162,13 +162,12 @@ class Chatroom extends Component {
         }
     }
     render() {
-        let d = this.state.chats
-        d.sort((a, b) => a.date - b.date)
+
         return (
-            <div className="wrapper"  >
+            <div className="wrap"  >
                 <nav className="px-1 px-md-3 py-1  navbar bg-white sticky-top navbar-light  navbar-expand" >
                     <div className="navbar-brand  " >
-                        <button className="d-lg-none nav-link mr-2" onClick={() => Router.push('/messages')} >
+                        <button className="d-lg-none text-dark nav-link mr-2" onClick={() => Router.push('/messages')} >
                             <i className="fa fa-arrow-left" />
                         </button>
                         <ProfilePicture online={this.state.receiver.online} src={this.state.receiver.profilePicture} size="40px" />
@@ -215,13 +214,13 @@ class Chatroom extends Component {
                     <Send submit={this.send} />
                 </div>
                 <style jsx>{`
-                         .wrapper {
+                         .wrap {
                     width : 100%;
                     height : 100%;
                     overflow : auto;
                     display : flex;
                     flex-direction : column;
-                    background :#fff url(/img/chatBg.jpg);
+                    background :var(--gray)  url(/img/chat-bg-light.jpg);
                     background-size: cover;
                 }
                 .navbar-brand {
@@ -235,7 +234,7 @@ class Chatroom extends Component {
                     font-size : 18px;
                 }
                 .info small {
-                    color: #0008;
+                    color: var(--gray-dark);
                     font-size : 12px;
                 }
                 .nav-item {
@@ -268,7 +267,6 @@ class Chatroom extends Component {
                     flex-shrink : 0;
                 }
                 .form {
-                    background : #fff6;
                 }
                 .spinner {
                     color : #f00;
@@ -283,6 +281,14 @@ class Chatroom extends Component {
                     width : 8px;
                 }
                 }
+                `}</style>
+                <style jsx global>{`
+                 body.dim  .wrap {
+                    background :var(--gray)  url(/img/chat-bg-dim.jpg);
+                  }
+                 body.dark  .wrap {
+                    background :var(--gray)  url(/img/chat-bg-dark.jpg);
+                  }
                 `}</style>
             </div>
         )

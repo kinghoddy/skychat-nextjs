@@ -30,16 +30,14 @@ export default class Feed extends React.Component {
         firebase.database().ref('users/').once('value', s => {
             const res = [];
             for (let key in s.val()) {
-                const ud = [s.val()[key].username, s.val()[key].fullName.toLowerCase()];
+                const ud = s.val()[key].username + s.val()[key].fullName.toLowerCase();
                 console.log(ud);
-                ud.forEach(cur => {
-                    if (cur.indexOf(q) > -1) {
-                        res.push({
-                            ...s.val()[key],
-                            key
-                        })
-                    }
-                });
+                if (ud.indexOf(q) > -1) {
+                    res.push({
+                        ...s.val()[key],
+                        key
+                    })
+                }
             }
             this.setState({ loading: false, people: res })
             console.log(res);
@@ -51,16 +49,13 @@ export default class Feed extends React.Component {
         firebase.database().ref('posts/').once('value', s => {
             const res = [];
             for (let key in s.val()) {
-                const ud = [s.val()[key].body.toLowerCase(), s.val()[key].username.toLowerCase()];
-                console.log(ud);
-                ud.forEach(cur => {
-                    if (cur.indexOf(q.toLowerCase()) > -1) {
-                        res.push({
-                            ...s.val()[key],
-                            id: key
-                        })
-                    }
-                });
+                const ud = s.val()[key].body.toLowerCase() + s.val()[key].username.toLowerCase();
+                if (ud.indexOf(q.toLowerCase()) > -1) {
+                    res.push({
+                        ...s.val()[key],
+                        id: key
+                    })
+                }
             }
             this.setState({ loading: false, posts: res.reverse() })
             console.log(res);

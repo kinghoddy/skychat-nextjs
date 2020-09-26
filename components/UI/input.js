@@ -13,14 +13,15 @@ const Input = props => {
              label {
                  font-size : 12px;
                  display : block;
-                 color : #0008;
+                 color : var(--gray-dark);
                  margin-bottom : 0;
                  text-transform : capitalize;
                  padding: 5px 10px 0;
              }
              .input textarea , .input input {
-                 border-bottom : 1px solid #0005;
+                 border-bottom : 1px solid  var(--dark);
                  width : 100%;
+                 background : none;
                  transition : all .5s;
                  color : var(--black);
                  text-transform : ${props.cap ? 'capitalize' : 'unset'};
@@ -29,7 +30,7 @@ const Input = props => {
              }
              ::placeholder {
                  font-weight : 400;
-                 color : #0005;
+                 color : var(--gray-dark);
              }
              .input textarea:focus , .input input:focus {
                  border-bottom : 2px solid #f20;

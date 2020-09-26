@@ -4,6 +4,15 @@ import Link from 'next/link'
 
 const UserList = props => {
     const [friends, setFriends] = React.useState(0)
+    React.useEffect(() => {
+        let f = 0
+        if (props.friendsId) {
+            for (let keys in props.friendsId) {
+                f++
+            }
+            setFriends(f)
+        }
+    }, [props.friendsId])
     return <div className="py-3 d-flex border-bottom position-relative" key={props.key}>
         <Link href="/[profile]" as={"/" + props.username} >
             <a className="stretched-link" >
@@ -26,7 +35,7 @@ const UserList = props => {
         <style jsx>{`
          .info {
              display : block;
-             color : #0007;
+             color : var(--gray-dark);
              font-weight : 600;
              font-size : ${props.small ? '13px' : 'unset'}
          }

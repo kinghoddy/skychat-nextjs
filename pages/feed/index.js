@@ -8,6 +8,7 @@ import Requests from '../../components/ffriends/requests';
 import Spinner from '../../components/UI/Spinner/Spinner';
 import Menu from '../../components/menu/menuList'
 import Suggestions from '../../components/ffriends/suggestions';
+import MayKnow from '../../components/ffriends/may-know';
 
 export default class Feed extends React.Component {
     state = {
@@ -89,8 +90,9 @@ export default class Feed extends React.Component {
                                 JSON.stringify(Posts.reverse())
                             );
                         }
-                        if (friendsArr.length - 1 === i) {
+                        if (friendsArr.length - 1 >= i) {
                             setTimeout(() => {
+
                                 this.setState({ posts: Posts.reverse(), update: false, loading: false });
                             }, 1000);
                         }
@@ -100,11 +102,14 @@ export default class Feed extends React.Component {
     };
     loadMore = () => {
         let count = this.state.loadCount;
-        count += 10;
-        const watch = document.getElementById("watch");
-        if (window.scrollY >= window.innerHeight) {
+        count += 5;
+        const watch = document.getElementById("watch").getBoundingClientRect().top;
+        if (window.scrollY >= watch) {
             if (this.state.loadCount < this.state.posts.length) {
-                this.setState({ loadCount: count });
+                setTimeout(() => {
+
+                    this.setState({ loadCount: count });
+                }, 500)
             }
         }
     };
@@ -116,19 +121,36 @@ export default class Feed extends React.Component {
         return <Layout title="Feed | Skychat">
             <div className="row py-2 py-lg-3 no-gutters">
                 <div className="col-lg-7 pr-lg-3">
-                    {!this.state.loading && this.state.update && <button className="btn rounded-pill update" onClick={this.getPosts} >
+                    {!this.state.loading && this.state.update && <button className="btn rounded-pill update" onClick={() => {
+                        this.getPosts();
+                        document.documentElement.scrollTop = 0;
+                    }} >
                         <i className="fal fa-arrow-up mr--2" /> Feed Updated
                     </button>}
                     <AddPost setUpload={this.props.setUpload} {...this.state.userData} />
+
+                    <div className="mb-2" >
+                        <Requests {...this.state.userData} />
+                    </div>
                     {this.state.posts.map(
                         (cur, i) =>
-                            i < this.state.loadCount && (
+                            i < 2 && (
                                 <Post key={cur.id} {...cur} likeeId={this.state.userData.uid} />
                             )
                     )}
-                    {this.state.loading && <div id="watch" style={{ height: '5rem' }} >
-                        <Spinner fontSize="3px" />
-                    </div>}
+                    <div className="mb-3">
+                        <MayKnow />
+                    </div>
+                    {this.state.posts.map(
+                        (cur, i) =>
+                            i > 2 && i < this.state.loadCount && (
+                                <Post key={cur.id} {...cur} likeeId={this.state.userData.uid} />
+                            )
+                    )}
+                    <div id="watch" style={{ height: '5rem' }}>
+
+                        {this.state.loading && <Spinner fontSize="3px" />}
+                    </div>
                 </div>
                 <div className="col-lg-5 pl-lg-3 position-relative">
                     <div className="side">
@@ -136,13 +158,7 @@ export default class Feed extends React.Component {
 
                             <Suggestions />
                         </div>
-                        <div className="mb-2 shadow-sm bg-light d-none d-lg-block" >
 
-                            <Menu />
-                        </div>
-                        <div className="mb-2" >
-                            <Requests {...this.state.userData} />
-                        </div>
                     </div>
                 </div>
             </div>

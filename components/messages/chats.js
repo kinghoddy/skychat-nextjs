@@ -14,13 +14,13 @@ class Chats extends React.Component {
     state = {
         search: '',
         uid: '',
-        loadCount: 10,
+        loadCount: 12,
         chats: []
     }
     componentDidUpdate() {
         if (this.props.uid !== this.state.uid) {
             this.setState({ uid: this.props.uid });
-            this.getChats(this.props.uid)
+            this.getChats(this.props.uid);
         }
     }
     componentWillUnmount() {
@@ -45,8 +45,8 @@ class Chats extends React.Component {
         }
     };
     getChats = (uid) => {
-        const chats = localStorage.getItem('skychatMessages')
-        if (chats) this.setState({ chats: JSON.parse(chats) })
+        const initChats = localStorage.getItem('skychatMessages')
+        if (initChats) this.setState({ chats: JSON.parse(initChats) });
         const db = firebase.database();
         this.setState({ loading: true });
         var ref = db.ref("users/" + uid + "/chats");
@@ -80,8 +80,10 @@ class Chats extends React.Component {
                                 });
 
                                 if (chats.length >= chatArr.length) {
-                                    localStorage.setItem('skychatMessages', JSON.stringify(chats))
-                                    this.setState({ chats: chats, loading: false });
+                                    setTimeout(() => {
+                                        this.setState({ chats, loading: false });
+                                        localStorage.setItem('skychatMessages', JSON.stringify(chats))
+                                    }, 500);
                                 }
                             }
                         })
@@ -98,7 +100,7 @@ class Chats extends React.Component {
         c.sort((a, b) => b.date - a.date)
 
         return <div className="wrapper" ref={this.watch}>
-            <nav className="px-3 py-2 navbar sticky-top navbar-light p-0  navbar-expand" >
+            <nav className="px-3 py-1 navbar  sticky-top navbar-light   navbar-expand" >
                 <div className="navbar-brand  " >
                     <button className="nav-link mr-2" onClick={() => Router.push('/feed')} >
                         <i className="fa fa-arrow-left" />
@@ -149,6 +151,14 @@ class Chats extends React.Component {
                     overflow : auto;
                     background : var(--white);
                 }
+                .wrapper::-webkit-scrollbar{
+                    width : 0px;
+                
+                }
+                nav {
+                    background : var(--white);
+                    margin-bottom : 15px;
+                }
                 .navbar-brand {
                     display : flex;
                     align-items : center;
@@ -164,6 +174,7 @@ class Chats extends React.Component {
                     align-items : center;
                     justify-content : center;
                     width : 40px;
+                    color : var(--black);
                     border-radius : 50%;
                 }
                 .nav-link i {
@@ -190,12 +201,15 @@ class Chats extends React.Component {
                        border : 0;
                        outline : 0;
                        background : none;
-                       color : #000;
+                       color : var(--black);
                        transition : all .3s;
                     }
                     .search input {
                         width : calc(100% - 35px);
                        padding : 0 15px;
+                   }
+                   ::placeholder {
+                       color : var(--gray-darky);
                    }
                    .search button {
                        width : 35px;
@@ -204,6 +218,20 @@ class Chats extends React.Component {
                        background : #ff220044 ;
                    }
 
+            `}</style>
+            <style jsx global>{`
+            body.dark .wrapper {
+                background : #000
+            }
+             body.dim .search{
+                  background : var(--gray);
+              }
+             body.dark .search{
+                  background : var(--gray);
+              }
+                     body.dark nav {
+                    background : #000;
+                }
             `}</style>
         </div>
     }

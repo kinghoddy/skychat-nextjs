@@ -20,6 +20,7 @@ export default class Feed extends React.Component {
             uid: ''
         },
         post: {},
+        loggedOut: false,
         loading: true
     }
 
@@ -31,15 +32,22 @@ export default class Feed extends React.Component {
                 if (user) {
                     let udata = JSON.parse(localStorage.getItem('skychatUserData'))
 
-                    if (udata) this.setState({ userData: udata, loading: true });
+                    if (udata) this.setState({ userData: udata, loading: false });
+                } else {
+                    this.setState({ loggedOut: true, loading: false })
                 }
             });
+        }
+        if (this.props.post) {
+
+        } else {
+            this.setState({ broken: true })
         }
     }
 
     render() {
 
-        return <Layout title={this.props.post.username + " added a new post| Skychat"} body={this.props.post.body}>
+        return <Layout stay broken={this.state.broken} title={this.props.post && this.props.post.username + " added a new post| Skychat"} body={this.props.post && this.props.post.body}>
             <div className="row py-2 py-lg-3 no-gutters">
                 <div className="col-lg-7 pr-lg-1">
                     {this.state.loading ? <div id="watch" style={{ height: '5rem' }} >

@@ -9,18 +9,18 @@ export default (props) => {
     if (hasUsed) {
       Router.push('/feed')
     }
-  }, [])
+  }, []);
   return (
     <div className="wrapper position-relative">
       <Head>
         <title>Skychat | Enjoy messaging in the Clouds </title>
         <meta property="og:title" content='Skychat | Enjoy messaging in the Clouds ' />
         <link rel="shortcut icon" href="/img/logo/logo_red.png" />
-        <meta property="og:image" content={"/img/logo/logo_red.png"} />
+        <meta property="og:image" content={"/img/logo/icon-512.png"} />
       </Head>
       <RouterLoader />
 
-      <nav className="navbar navbar-light border-bottom navbar-expand-lg fixed-top bg-light">
+      <nav className="navbar navbar-light  navbar-expand-lg fixed-top bg-light">
         <Link href="/">
           <a className="navbar-brand ">
             <img src="/img/logo/skychat_red.png" />
@@ -72,7 +72,15 @@ export default (props) => {
         </div>
       </header>
       <style jsx>{`
+        .wrapper{
+          background : #fff
+        }
         nav {
+          background : #fff !important;
+          box-shadow : 0 3px 8px #0002;
+        }
+        nav *{
+          color : #000 !important;
         }
         nav img {
           height: 2rem;

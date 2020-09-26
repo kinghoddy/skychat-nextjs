@@ -10,7 +10,7 @@ export default class RequestUser extends React.Component {
                     <ProfilePicture size="45px" src={this.props.src} online={this.props.online} />
                 </a>
             </Link>
-            <div className="pl-2" >
+            <div className="pl-2" style={{ flex: 1 }} >
                 <h6 className="text-capitalize" >{this.props.username}
                     <small className="font-weight-light" > sent you a friend request</small>
                 </h6>
@@ -33,7 +33,7 @@ export default class RequestUser extends React.Component {
                    display : flex;
                }
                .buttons button {
-                   font-size : 10px;
+                   font-size : 15px;
                    width : 45%;
                    padding : 3px 10px;
                }

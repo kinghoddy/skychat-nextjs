@@ -17,7 +17,7 @@ const Media = props => {
                         <i className={'fa fa-' + cur.type} />
                     </div>
 
-                    {cur.type === 'image' ? <Img onClick={show} maxHeight="80vh" alt="" src={cur.src} /> : <Video show={show} style={{ objectFit: props.sources.length > 1 ? 'cover' : 'contain' }} freeze={props.freeze} src={cur.src} />}
+                    {cur.type === 'image' ? <Img isFeed={props.sources.length === 1 ? true : false} onClick={show} maxHeight="80vh" alt="" src={cur.src} /> : <Video show={show} style={{ objectFit: props.sources.length > 1 ? 'cover' : 'contain' }} freeze={props.freeze} src={cur.src} />}
                 </a>
             </div>
         })}
@@ -33,7 +33,7 @@ const Media = props => {
         }
       
                .image {
-                   height : ${props.sources.length === 2 ? '20rem' : props.sources.length > 2 ? '10rem' : 'unset'};
+                   height : ${props.sources.length === 2 ? '20rem' : props.sources.length > 2 ? '10rem' : 'auto'};
                    width : 100%;
                    display : block;
                    background : var(--secondary);

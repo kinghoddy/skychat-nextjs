@@ -17,7 +17,7 @@ export default class Post extends React.Component {
     state = {
         post: {
             media: [],
-            icon: '/avatar-red.png'
+            icon: '/img/avatar-red.png'
         },
         likeeId: this.props.likeeId,
         commentsLength: 0,
@@ -29,8 +29,8 @@ export default class Post extends React.Component {
         popover: false,
         isMine: false,
         fullPost: false,
+        readMore: false,
         focusCom: false
-
     }
     like = () => {
         if (this.state.likeeId) {
@@ -41,7 +41,17 @@ export default class Post extends React.Component {
                 this.setState({ liked: null });
                 ref.set(null);
             } else {
-                ref.set(Date.now());
+                let ud = JSON.parse(localStorage.getItem('skychatUserData'))
+                let n = {
+                    title: ud.username + ' and ' + this.state.likesLength + ' others liked your post',
+                    icon: (this.state.post.media[0] && this.state.post.media[0].type === 'image') && this.state.post.media[0].src || ud.profilePicture,
+                    link: '/post/' + this.props.id,
+                    date: Date.now()
+                }
+                if (!this.state.isMine) firebase.database().ref('users/' + this.props.uid + '/notification').push(n)
+                play('like')
+                ref.set(Date.now()).then(() => {
+                });
                 this.setState({ liked: true });
             }
         }
@@ -105,9 +115,13 @@ export default class Post extends React.Component {
         }
 
         let networkState = window.navigator.onLine;
+        let m = [];
+        if (this.props.media) {
+            for (let keys in this.props.media) m.push({ ...this.props.media[keys] })
+        }
         this.setState({
             loading: networkState,
-            post: { media: [], ...this.props, body: formatLink(this.props.body) },
+            post: { ...this.props, media: m, body: formatLink(this.props.body) },
             likesLength: likesLength,
         });
 
@@ -194,6 +208,10 @@ export default class Post extends React.Component {
             });
         }
     }
+    readMore = e => {
+        e.preventDefault();
+        this.setState({ readMore: !this.state.readMore })
+    }
     render() {
         let b = [{
             title: 'Reload Post',
@@ -208,7 +226,7 @@ export default class Post extends React.Component {
         {
             title: 'Share External',
             action: this.share,
-            icon: 'fa-share'
+            icon: 'fa-share-alt'
         }
         ];
         if (this.state.isMine) {
@@ -228,13 +246,13 @@ export default class Post extends React.Component {
             <Popover buttons={b}
                 show={this.state.popover} cancel={() => this.setState({ popover: false })} />
             <div className="d-flex align-items-center px-3 py-1">
-                {this.state.loading ? <div className='pp' /> : <PPicture src={this.state.post.icon} size='40px' online={this.state.post.online} />}
+                <PPicture src={this.state.post.icon} size='40px' online={this.state.post.online} />
                 <Link href='/[profile]' as={'/' + this.state.post.username} >
-                    <a className="ml-3 text-dark">
-                        <h6 className="mb-0 text-capitalize">
+                    <a className="ml-3">
+                        <h6 className="mb-0 text-capitalize" style={{ color: 'var(--black)' }} >
                             {this.state.post.username}
                         </h6>
-                        <small>{dateFormat(this.state.post.date)}</small>
+                        <small style={{ color: 'var(--gray-dark)' }} >{dateFormat(this.state.post.date)}</small>
                     </a>
                 </Link>
                 <button className="ml-auto rounded-circle px-3 btn-more" onClick={() => this.setState({ popover: true })}>
@@ -244,25 +262,32 @@ export default class Post extends React.Component {
             {this.state.post.title && (
                 <h4 className="mb-0 post_title">{this.state.post.title}</h4>
             )}
-            {this.state.post.body && (
+            {this.state.post.body && (<div className="post_body">
+
                 <div
-                    className="post_body"
-                    dangerouslySetInnerHTML={{ __html: this.state.post.body }}
+
+                    dangerouslySetInnerHTML={{ __html: this.state.readMore ? this.state.post.body : this.state.post.body.substring(0, 200) + (this.state.post.body.length > 200 ? '...' : '') }}
                 ></div>
+                {this.state.post.body.length > 200 &&
+                    <a className="btn btn-sm rounded-pill mt-2 btn-block btn-outline-dark" href="#" onClick={this.readMore}>{this.state.readMore ? 'See less' : 'Continue Reading...'}</a>}
+            </div>
             )}
-            {this.props.media && this.state.post.media.length === 0 && this.state.loading && <Placeholder style={{ height: "300px" }} />}
+            {this.props.media && this.state.post.media.length < 1 && this.state.loading && <Placeholder style={{ height: "300px" }} />}
 
             {this.state.post.media.length > 0 && <Media show={(s) => this.setState({ fullPost: s })} freeze sources={this.state.post.media} />}
             <div className="buttons">
                 <button onClick={this.like} >
-                    <i className={(this.state.liked ? 'fa' : 'fal') + ' fa-heart'} style={{ color: this.state.liked ? 'red' : 'black' }} />
+                    <i className={(this.state.liked ? 'fa' : 'fal') + ' fa-heart'} style={{ color: this.state.liked ? 'red' : 'var(--black)' }} />
                 </button>
                 <button onClick={() => {
-                    this.setState({ focusCom: true, clicked: true })
-                    setTimeout(() => {
-
-                        this.setState({ focusCom: false })
-                    }, 1000)
+                    if (this.props.likeeId) {
+                        this.setState({ focusCom: true, clicked: true })
+                        setTimeout(() => {
+                            this.setState({ focusCom: false })
+                        }, 1000)
+                    } else {
+                        alert('Login to like comment , and share ')
+                    }
 
                 }}>
                     <i className='fal fa-comment-minus' />
@@ -291,17 +316,19 @@ export default class Post extends React.Component {
             Share{this.state.sharesLength !== 1 ? "s" : null}
                 </span>
             </div>
-            {(this.state.commentsLength > 0 || this.state.clicked) && <Comment focus={this.state.focusCom} id={this.props.id} commentsLength={this.state.commentsLength} />}
+            {(this.state.likeeId && this.state.commentsLength > 0 || this.state.clicked) && <Comment focus={this.state.focusCom} isMine={this.state.isMine} uid={this.props.uid} id={this.props.id} post={this.state.post} commentsLength={this.state.commentsLength} />}
             <style jsx>{`
             .post {
-            margin-bottom: 10px;
+            margin-bottom: 15px;
             background: var(--white);
         }
         .btn-more {
             background : none;
+            color : var(--gray-dark)
         }
         .btn-more:hover {
-            background : #eee
+            background : var(--gray);
+
         }
         .pp {
             height : 40px;
@@ -317,7 +344,7 @@ export default class Post extends React.Component {
 }
 .post_body {
   font-size : 15px;
-  line-height : 20px;
+  white-space : pre-line;
   padding:  10px 18px;
 }
 .post_info {
@@ -336,6 +363,7 @@ export default class Post extends React.Component {
 .buttons  button {
     background : none;
     font-size : 18px;
+    color : var(--black);
     margin : 0 10px;
     border-radius : 30px;
 }

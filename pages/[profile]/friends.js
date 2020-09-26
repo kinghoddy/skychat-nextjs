@@ -79,7 +79,7 @@ export default class AllFriends extends React.Component {
     render() {
         return <Layout broken={this.state.broken} stay title={(this.props.d.username && 'Friends Of' + this.props.d.username.toUpperCase()) + " | Skychat"} src={this.props.d.profilePicture}>
             <CoverProfileLess {...this.props.d} />
-            <div className="p-4 d-flex justify-content-between" >
+            <div className="px-4 my-2 py-3 d-flex justify-content-between nav" >
                 <h5 className="mb-0" > <i className="fa fa-user-friends" /> All Friends</h5>
                 <span>{this.state.friendsLength}</span>
             </div>
@@ -94,6 +94,14 @@ export default class AllFriends extends React.Component {
             <div style={{ height: '5rem' }} className="watch">
                 {this.state.loading && <Spinner fontSize="3px" />}
             </div>
+            <style jsx>{`
+                .nav {
+                    position : sticky ;
+                    top : 2.8rem;
+                    background : inherit;
+                    z-index : 1000
+                }   
+              `}</style>
         </Layout>
     }
 }

@@ -7,15 +7,13 @@ const VideoPost = props => {
 
     const watchScroll = () => {
         if (video.current) {
-            if (!props.freeze) {
-                const vidtop = video.current.getBoundingClientRect().top;
-                if (vidtop < 300 && vidtop > 0) {
-                    video.current.play()
-                    setPlay(true)
-                } else {
-                    video.current.pause()
-                    setPlay(false)
-                }
+            const vidtop = video.current.getBoundingClientRect().top;
+            if (vidtop < 300 && vidtop > 0) {
+                video.current.play()
+                setPlay(true)
+            } else {
+                video.current.pause()
+                setPlay(false)
             }
             video.current.onended = e => {
                 setPlay(false)

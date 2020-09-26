@@ -65,94 +65,100 @@ class Profile extends React.Component {
         Router.push('/search?q=' + this.state.search)
     }
     render() {
-        return <div className="wrapper position-relative ">
+        return <div className="wrappers position-relative ">
             <Head>
-                <title>{this.props.title}</title>
-                <meta property="og:title" content={this.props.title} />
+                <title>{this.props.title || 'Join skychat today'}</title>
+                <meta property="og:title" content={this.props.title || 'Join Skychat Today'} />
                 <meta property="og:description" content={this.props.body || 'Join skychat today'} />
                 <link rel="shortcut icon" href="/img/logo/logo_red.png" />
-                <meta property="og:image" content={this.props.src ? this.props.src : "/img/logo/logo_red.png"} />
+                <meta property="og:image" content={this.props.src ? this.props.src : "/img/logo/icon-512.png"} />
             </Head>
             <RouterLoader />
             <nav className="navbar fixed-top navbar-expand navbar-light bg-white" id="navTop">
                 <div className="container">
                     <a href="#" className="navbar-brand logo">
-                        <img alt="" src="/img/logo/skychat_red.png" />
+
+                        <img alt="" src="/img/logo/skychat_light_1.png" className="dark_logo" />
+                        <img alt="" src="/img/logo/skychat_red.png" className="light_logo" />
                     </a>
-                    {this.state.isPhone ? <div className="phone collapse navbar-collapse" >
-                        <div className={"animated fast d-flex phoneSearch " + (this.state.showSearch ? 'slideInDown' : 'slideOutUp')} >
-                            <button onClick={this.cancelSearch}>
-                                <i className="fa fa-arrow-left" />
-                            </button>
-                            <form className="search" onSubmit={this.search} >
-                                <input type="text" placeholder="Search..." value={this.state.search} onChange={e => this.setState({ search: e.target.value })} />
-                                <button>
-                                    <i className="fal fa-search"></i>
+                    <div className="d-lg-none">
+                        <div className=" phone collapse navbar-collapse "   >
+                            <div className={"animated fast d-flex phoneSearch " + (this.state.showSearch ? 'slideInDown' : 'slideOutUp')} >
+                                <button onClick={this.cancelSearch}>
+                                    <i className="fa fa-arrow-left" />
                                 </button>
-                            </form>
-                        </div>
-                        <ul className="navbar-nav ml-auto" >
-                            <li className="nav-item" >
-                                <button className="bg-white nav-link" onClick={() => this.setState({ showSearch: true })} >
-                                    <i className="fal fa-search"></i>
-                                </button>
-                            </li>
-                            <li className="nav-item" >
-                                <Link href="/messages" activeClassName="active" >
-                                    <a className="nav-link">
-                                        <i className="fal fa-comments"></i>
-                                    </a>
-                                </Link>
-                            </li>
-                        </ul>
-
-
-                    </div> : <React.Fragment>  <form className="search" onSubmit={this.search} >
-                        <input type="text" placeholder="Search..." value={this.state.search} onChange={e => this.setState({ search: e.target.value })} />
-                        <button>
-                            <i className="fal fa-search"></i>
-                        </button>
-                    </form>
-                            <div className="comp collapse navbar-collapse">
-                                <ul className="navbar-nav">
-                                    <li className="nav-item">
-                                        <Link href="/feed" activeClassName="active" >
-                                            <a className="nav-link">
-                                                <i className="fal fa-home"></i>
-                                            </a>
-                                        </Link>
-                                    </li>
-                                    <li className="nav-item">
-                                        <Link href="/messages" activeClassName="active" >
-                                            <a className="nav-link">
-                                                <i className="fal fa-comments"></i>
-                                            </a>
-                                        </Link>
-                                    </li>
-                                    <li className="nav-item">
-                                        <Link href="/notifications" activeClassName="active" >
-                                            <a className="nav-link">
-                                                <i className="fal fa-bells"></i>
-                                            </a>
-                                        </Link>
-                                    </li>
-                                    <li className="nav-item">
-                                        <Link href="/menu" activeClassName="active" >
-                                            <a className={"nav-link " + (this.props.active === 'menu' && 'active')}>
-                                                <i className="fal fa-bars"></i>
-                                            </a>
-                                        </Link>
-                                    </li>
-                                </ul>
+                                <form className="search" onSubmit={this.search} >
+                                    <input type="text" placeholder="Search..." value={this.state.search} onChange={e => this.setState({ search: e.target.value })} />
+                                    <button>
+                                        <i className="fal fa-search"></i>
+                                    </button>
+                                </form>
                             </div>
-                            {this.state.loggedOut ? <Link href="/login">
-                                <a className="btn btn-fav" > <i className="fa fa-sign-in mr-2" /> Login</a>
-                            </Link> : <Link href="/[profile]" as={"/" + this.state.userData.username} activeClassName="pActive">
-                                    <a className="d-flex p-1 align-items-center  rounded-pill">
-                                        <Ppicture size="35px" src={this.state.userData.profilePicture} />
-                                        <span className="text-dark font-weight-bold pl-2 pr-4 text-capitalize" >{this.state.userData.username}</span>
-                                    </a>
-                                </Link>} </React.Fragment>}
+                            <ul className="navbar-nav ml-auto" >
+                                <li className="nav-item" >
+                                    <button className="bg-white nav-link" onClick={() => this.setState({ showSearch: true })} >
+                                        <i className="fal fa-search"></i>
+                                    </button>
+                                </li>
+                                <li className="nav-item" >
+                                    <Link href="/messages" activeClassName="active" >
+                                        <a className="nav-link">
+                                            <i className="fal fa-comments"></i>
+                                        </a>
+                                    </Link>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div className="d-none d-lg-flex" style={{ flex: 1 }}  >
+                        <form className="search" onSubmit={this.search} >
+                            <input type="text" placeholder="Search..." value={this.state.search} onChange={e => this.setState({ search: e.target.value })} />
+                            <button>
+                                <i className="fal fa-search"></i>
+                            </button>
+                        </form>
+                        <div className="comp collapse navbar-collapse">
+                            <ul className="navbar-nav">
+                                <li className="nav-item">
+                                    <Link href="/feed" activeClassName="active" >
+                                        <a className="nav-link">
+                                            <i className="fal fa-home"></i>
+                                        </a>
+                                    </Link>
+                                </li>
+                                <li className="nav-item">
+                                    <Link href="/messages" activeClassName="active" >
+                                        <a className="nav-link">
+                                            <i className="fal fa-comments"></i>
+                                        </a>
+                                    </Link>
+                                </li>
+                                <li className="nav-item">
+                                    <Link href="/notifications" activeClassName="active" >
+                                        <a className="nav-link">
+                                            <i className="fal fa-bells"></i>
+                                        </a>
+                                    </Link>
+                                </li>
+                                <li className="nav-item">
+                                    <Link href="/menu" activeClassName="active" >
+                                        <a className={"nav-link " + (this.props.active === 'menu' && 'active')}>
+                                            <i className="fal fa-bars"></i>
+                                        </a>
+                                    </Link>
+                                </li>
+                            </ul>
+                        </div>
+                        {this.state.loggedOut ? <Link href="/login">
+                            <a className="btn btn-fav my-1"  > <i className="fa fa-sign-in mr-2" /> Login</a>
+                        </Link> : <Link href="/[profile]" as={"/" + this.state.userData.username} activeClassName="pActive">
+                                <a className="my-1 d-flex p-1 align-items-center  rounded-pill">
+                                    <Ppicture size="35px" src={this.state.userData.profilePicture} />
+                                    <span className="text-dark font-weight-bold pl-2 pr-4 text-capitalize" >{this.state.userData.username}</span>
+                                </a>
+                            </Link>}
+                    </div>
                 </div>
             </nav>
             <div className="con ">
@@ -195,22 +201,24 @@ class Profile extends React.Component {
                     </div>}
             </nav>
             <style jsx>{`
-                   .wrapper {
+                   .wrappers {
                         background : #f7f7f7;
                         padding-top : 3rem;
                         padding-bottom : 3rem;
+                        transition : all .3s;
                         min-height : 100vh;
                    }
+             
                    .con {
                        max-width : 58rem;
                        margin : 0 auto;
                        min-height : 100%;
-                   }
-                   .dark .wrapper {
-                       background : #111;
+                       background : inherit;
+                        transition : all .3s;
                    }
                    nav {
                        box-shadow : 0 0px 5px #0002;
+                        transition : all .3s;
                    }
                    #navTop {
                        padding : 0;
@@ -262,12 +270,15 @@ class Profile extends React.Component {
                        border : 0;
                        outline : 0;
                        background : none;
-                       color : #000;
+                       color : var(--black);
                        transition : all .3s;
                     }
                     .search input {
                         width : calc(100% - 35px);
                        padding : 0 15px;
+                   }
+                   ::placeholder {
+                       color : var(--gray-dark)
                    }
                    .search button {
                        width : 35px;
@@ -276,7 +287,7 @@ class Profile extends React.Component {
                        background : #ff220044 ;
                    }
                    .phoneSearch {
-                       background: #ffffff;
+                       background: var(--white);
                        position : absolute ;   
                        padding :0 10px;
                        top : 0;
@@ -292,11 +303,37 @@ class Profile extends React.Component {
                    .pActive {
                        background : #dddddd77;
                    }
-                   @media only screen and (min-width : 1200px) {
-                       .logo {
-                       }
+                          .light_logo {
+                       display : block;
+                   }
+                    .dark_logo {
+                       display : none
                    }
                 `}</style>
+            <style jsx global>{`
+                 body.dark .wrappers {
+                       background : #060606;
+                   }
+                 body.dark  .light_logo {
+                       display : none;
+                   }
+                   body.dark .dark_logo {
+                       display : block
+                   }
+                 body.dim .wrappers {
+                       background : #11131a;
+                   }
+                 body.dim  .light_logo {
+                       display : none;
+                   }
+                   body.dim .dark_logo {
+                       display : block
+                   }
+                   body.dark .search {
+                       background : #f719;
+
+                   }
+            `}</style>
         </div>
     }
 }

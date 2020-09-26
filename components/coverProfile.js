@@ -105,12 +105,12 @@ const CoverProfile = props => {
         })
         // Send Accepted notification 
         let n = {
-            title: props.username + ' Accepted Your Friend Request',
-            icon: props.profilePicture,
-            link: '/[profile]?profile=' + props.username,
+            title: props.userData.username + ' Accepted Your Friend Request',
+            icon: props.userData.profilePicture,
+            link: '/' + props.userData.username,
             date: Date.now()
         }
-        ref.child('notifications').push(n)
+        ref.child('notification').push(n)
     }
     const share = async () => {
         setToast(null)
@@ -217,6 +217,7 @@ const CoverProfile = props => {
             margin-top : -5rem;
             align-items : flex-end
         }
+        
         .names {
             margin-top :75px;
             padding : 0 10px;

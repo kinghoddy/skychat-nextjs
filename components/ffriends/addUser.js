@@ -1,15 +1,41 @@
-import React from 'react';
-import Img from './img/img'
+import React, { useState } from 'react';
+import Img from '../UI/img/img'
 import Link from 'next/link'
+import firebase from '../../firebase';
+import 'firebase/database'
+import play from '../Audio/Audio';
+import Toast from '../UI/Toast/Toast'
 export default props => {
+    const [toast, setToast] = useState(null)
+    const [reqSent, setReqSent] = useState(false)
+    const sendRequest = () => {
+        setToast(null)
+        var ref = firebase.database().ref("users/" + props.uid + "/requestsId/" + props.userData.uid);
+        if (reqSent) {
+            ref.remove().then(() => {
+                setToast('Request Canceled')
+                play('delete')
+            })
+            setReqSent(false)
+        } else {
+            ref
+                .set(Date.now())
+                .then(res => {
+                    play('click')
+                    setToast('Request Sent')
+                })
+            setReqSent(true)
+        }
+    };
     return <div className="profilePicture">
-        {props.src && <div className="img" > <Img alt="" src={props.src} /></div>}
-        <div className={props.full ? 'px-3' : ''} >
-
+        {toast && <Toast>{toast}</Toast>}
+        {props.src && <Link href="/[profile]" as={"/" + props.username}>
+            <a className="img" > <Img alt="" src={props.src} /></a>
+        </Link>
+        }
+        <div className="px-3"  >
             <h6 className="text-capitalize mb-0 mt-2 " >{props.fullName} </h6>
-            <Link href="/[profile]" as={"/" + props.username}>
-                <a className="name text-dark stretched-link"  >{props.username}</a>
-            </Link>
+            <span className="name text-dark"  >{props.username}</span>
             {props.info && <React.Fragment>
                 {props.info.bio && <span className="info " > <i className="fal mr-2 fa-info-circle" />
                     {props.info.bio.substring(0, 30)}...</span>}
@@ -18,6 +44,9 @@ export default props => {
                 {props.info.email && <span className="info " > <i className="fa fa-envelope mr-2" />
                     {props.info.email}</span>}
             </React.Fragment>}
+
+            <button className="btn btn-block btn-fav mt-2" onClick={sendRequest} >
+                <i className="fal fa-user-plus mr-2 " /> {reqSent ? 'Cancel Request' : 'Add friend'}      </button>
         </div>
         {props.online && <span className="online" ></span>}
         <style jsx>{`
@@ -33,7 +62,8 @@ export default props => {
          
           .img {
               background : var(--light);
-              height : ${props.full ? '150px' : '100px'};
+              height : 190px;
+              display : block;
               border: 1px solid var(--gray);
               border-radius : 10px;
               overflow : hidden

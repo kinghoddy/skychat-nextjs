@@ -40,7 +40,7 @@ export default class Info extends React.Component {
                 padding : 5px;
             }
             .list > * {
-                color : #0009;
+                color : var(--dark);
                 font-weight : 500
             }
             .list i {

@@ -11,11 +11,19 @@ const Comment = props => {
 
         if (ud) setUserData(ud);
 
+
     }, []);
     React.useEffect(() => {
-        if (props.focus) editor.current.focus()
+        if (props.initValue) {
+            editor.current.onfocus = e => {
+                setText(props.initValue);
+                editor.current.innerText = props.initValue;
+            }
+        }
 
-    }, [props.focus])
+        if (props.focus) editor.current.focus();
+
+    }, [props.focus, props.initValue])
     // submit
     const submit = e => {
         e.preventDefault();
@@ -44,7 +52,7 @@ const Comment = props => {
             <ProfilePicture online={true} size="30px" src={userData.profilePicture} />
             <div className="text ml-2">
                 {!text && <div className="placeholder" >Add a comment...</div>}
-                <div ref={editor} className="editor" onPaste={paste} contentEditable={true} onInput={e => setText(e.target.innerHTML)}>
+                <div onBlur={props.onBlur} ref={editor} className="editor" onPaste={paste} contentEditable={true} onInput={e => setText(e.target.innerHTML)}>
                 </div>
             </div>
             <button className="send" >
@@ -62,6 +70,7 @@ const Comment = props => {
                display : flex;
                flex : 1;
                height :100%;
+               width : 100%;
                align-items : flex-end;
             }
             .text::scrollbar {
@@ -80,7 +89,7 @@ const Comment = props => {
             .placeholder {
                 position:absolute;
                 top: 50%;
-                color : #0007;
+                color : var(--gray-dark);
                 left :15px;
                 transform : translateY(-50%);
             } 
@@ -89,16 +98,21 @@ const Comment = props => {
                 }
 
             .editor {
+                position : relative;
+                z-index: 100;
                 white-space : pre-line;
                 overflow-wrap : break-word; 
-                overflow : auto;
+                overflow-y : auto;
+                word-break:break-all;
+                overflow-x : hidden;
+                width : 100%;
                 max-height : 9rem;
             }
             .send {
                 align-items : center;
                 display : flex;
                 justify-content : center;
-               background : #0001;
+               background : var(--secondary);
                border-radius : 50%;
                height : 30px;
                width : 30px;

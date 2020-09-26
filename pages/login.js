@@ -143,7 +143,7 @@ class Login extends React.Component {
                 <a>Create an account</a>
               </Link>
             </div>
-            <button className="text-light btn btn-login px-4">Login</button>
+            <button className="text-light btn btn-fav px-4">Login</button>
           </div>
         </form>
         <div className="mt-3">
@@ -155,6 +155,9 @@ class Login extends React.Component {
         </div>
         <style>
           {`
+                  h3 ,p , div {
+            color : #000;
+          }
           form {
               width : 100%;
           }
@@ -167,6 +170,10 @@ class Login extends React.Component {
                 border-bottom : 2px solid #f73;
                 margin-bottom : 20px;
                 background : none;
+                color : #000
+            }
+            ::placeholder {
+              color : #777
             }
             form input:focus {
                 border-bottom : 2px solid #fc3;
@@ -192,7 +199,9 @@ class Login extends React.Component {
                 color: #fff;
             }
             .google img {
-                height : 100%
+                height : 100%;
+                   object-fit : contain;
+                max-width : 30px;
             }
         `}
         </style>

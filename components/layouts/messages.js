@@ -25,6 +25,9 @@ class Message extends React.Component {
         }
     }
     loadUserData = () => {
+        let ud = localStorage.getItem("skychatUserData");
+        if (ud) this.setState({ userData: JSON.parse(ud) })
+
         this.setState({ loading: true });
         firebase.auth().onAuthStateChanged((user) => {
             if (user) {
@@ -52,6 +55,8 @@ class Message extends React.Component {
     render() {
         return <div className="wrapper position-relative ">
             <Head>
+                <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+                <meta name="HandheldFriendly" content="true" />
                 <title>{this.props.title}</title>
                 <meta property="og:title" content={this.props.title} />
                 <link rel="shortcut icon" href="/img/logo/logo_blue.png" />

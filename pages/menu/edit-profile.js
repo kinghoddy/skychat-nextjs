@@ -250,7 +250,7 @@ class Menu extends React.Component {
                 z-index : 1500
             }
                 .row {
-                    background : #e7e7e7;
+                    background : var(--gray);
                     min-height : 100vh;
                 }    
                            .cursor {
@@ -264,7 +264,7 @@ class Menu extends React.Component {
                    height : 100%;
                    border-radius : 10px;
                    width : 100%;
-                   background: #fff;
+                   background: var(--white);
                    object-fit : cover
                }
                .cover > div {
@@ -273,7 +273,7 @@ class Menu extends React.Component {
                    justify-content : center;
                }
                .con {
-                   background : #f7f7f7;
+                   background :var(--light);
                    padding : 20px 10px;
                }
                @media only screen and (min-width : 1200px) {

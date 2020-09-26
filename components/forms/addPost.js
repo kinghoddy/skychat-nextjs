@@ -7,6 +7,7 @@ import 'firebase/storage';
 import 'firebase/database';
 import Toast from '../UI/Toast/Toast';
 import play from '../Audio/Audio'
+import Modal from '../UI/modal';
 
 export default class AddPost extends React.Component {
     state = {
@@ -59,7 +60,7 @@ export default class AddPost extends React.Component {
     uploadTask = (file, callback, type) => {
         // Upload file and metadata to the object 'images/mountains.jpg'
         this.setState({ toast: null });
-        if (file.size < 10000000) {
+        if (file.size < 15000000) {
             let n = Date.now();
             var uploadTask = firebase
                 .storage()
@@ -93,7 +94,7 @@ export default class AddPost extends React.Component {
                 }
             );
         } else {
-            alert('A file should not be more than 10mb')
+            alert('A file should not be more than 15mb')
         }
     };
     sendPost = (e) => {
@@ -152,7 +153,7 @@ export default class AddPost extends React.Component {
                         <Ppicture size="40px" src={this.props.profilePicture} />
                     </a>
                 </Link>
-                <button onClick={(e) => { e.preventDefault(); this.setState({ show: true }) }} className="input" placeholder="Whats on your mind ?" >Whats on your mind ?</button>
+                <button onClick={(e) => { e.preventDefault(); this.setState({ show: true }) }} className="input" >Whats on your mind ?</button>
             </div>
             <div className="d-flex justify-content-around">
                 <button className="button" onClick={() => {
@@ -161,7 +162,7 @@ export default class AddPost extends React.Component {
                 }} >
                     <i className="fal text-warning fa-image"></i>
                     <i className="fal text-danger fa-video"></i>
-                    <span>Photo / Video</span>
+                    <span className="text-dark" >Photo / Video</span>
                 </button>
             </div>
             <style jsx>{`
@@ -170,6 +171,7 @@ export default class AddPost extends React.Component {
                 }
                 .input {
                     background : #dddddd55;
+                    color : var(--gray-dark);
                     margin : 0;
                     padding :0 10px;
                     transition : all .3s;
@@ -206,8 +208,7 @@ export default class AddPost extends React.Component {
     }
 }
 
-const Form = props => <React.Fragment>
-    <div className="backdrop animated fadeIn"></div>
+const Form = props => <Modal cancel={props.close} >
     <div className="wrapper animated fadeInUp  shadow">
         <button onClick={props.close} className="p-2 cancel rounded-circle">
             <i className="fal fa-2x fa-times "></i>
@@ -225,12 +226,12 @@ const Form = props => <React.Fragment>
             <Images freeze sources={props.tempSrc} />
         </div>
         <footer className="p-2" >
-            <div className="d-flex justify-content-around border p-2 align-items-center">
-                <strong>Add to your post </strong>
+            <div className="d-flex justify-content-around border mb-2 p-2 align-items-center">
+                <strong style={{ color: 'var(--gray-dark)' }} >Add to your post </strong>
                 <div className="d-flex">
                     <button className="button" onClick={props.addMedia} >
                         <i className="fal text-warning fa-photo-video"></i>
-                        <span>Photo / Video</span>
+                        <span className="text-dark">Photo / Video</span>
                     </button>
 
                 </div>
@@ -243,21 +244,16 @@ const Form = props => <React.Fragment>
     </div>
     <style jsx>{`
        .wrapper {
-           position : fixed;
            border-radius : 10px;
-           width : 100%;
+           width : 100vw;
            max-width : 35rem;
-           margin : auto;
-           left : 0;
-           bottom : 0rem;
-           animation-duration : .5s;
            height : 100vh;
            overflow : auto;
            display : flex;
            flex-direction : column;
            justify-content: space-between;
            background : var(--white);
-           z-index : 1500;
+           position : relative;
        }
         .textarea {
            min-height : 40vh;
@@ -266,6 +262,8 @@ const Form = props => <React.Fragment>
            flex : 1;
            margin-top : 8px;
            padding : 10px;
+           background : var(--white);
+           color : var(--black);
            font-size : 20px;
            transition : all .3s;
         }
@@ -278,11 +276,11 @@ const Form = props => <React.Fragment>
            position : sticky;
            bottom : 0;
            z-index : 600;
-           background : var(--white);
+           background : var(--light);
        }
-       .button {
+                 .button {
                     display : flex;
-                    background : #0001;
+                    background : var(--gray);
                     border-radius : 30px;
                     align-items : center;
                     transition : all .3s;
@@ -312,10 +310,9 @@ const Form = props => <React.Fragment>
                     .wrapper {
                         height : unset;
                         max-height : calc(100vh - 6rem);
-                        bottom : unset;
                         top : 5rem;
                         left : calc(50% - 17.5rem)
                     }
                 }
     `}</style>
-</React.Fragment>
+</Modal>

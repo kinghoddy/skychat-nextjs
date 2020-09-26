@@ -31,7 +31,8 @@ const Popover = (props) => {
             text-align : left;
             width : 100%;
             padding : 10px;
-            background : var(--white)
+            background : var(--white);
+            color : var(--black);
         }
         .button:hover {
             background : var(--gray);

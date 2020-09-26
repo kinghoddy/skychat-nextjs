@@ -5,6 +5,7 @@ import 'firebase/storage';
 import 'firebase/auth';
 import Install from '../components/install';
 import NotPanel from '../components/notification/notPanel';
+import Splashscreen from '../components/splashscreen'
 function MyApp({ Component, pageProps }) {
     const [uploadProgress, setUploadProgress] = useState(0)
     const [nots, setNots] = useState([]);
@@ -84,7 +85,6 @@ function MyApp({ Component, pageProps }) {
 
                 })
             } else {
-                this.setState({ loading: false, chats: [] });
             }
         });
     }
@@ -92,6 +92,7 @@ function MyApp({ Component, pageProps }) {
         {uploadProgress > 0 && <div className="progress" >
             <div className="progress-bar" role="progressbar" style={{ width: uploadProgress + '%' }} aria-valuenow={uploadProgress} aria-valuemin="0" aria-valuemax="100">{uploadProgress}%</div>
         </div>}
+        <Splashscreen time={2000} />
         <Install />
         {nots}
         <Component setUpload={task} {...pageProps} />

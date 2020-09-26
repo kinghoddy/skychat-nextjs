@@ -23,7 +23,7 @@ class Menu extends React.Component {
             </div>
             <style jsx>{`
                      .row {
-                    background : #e7e7e7;
+                    background : var(--gray);
                     min-height : calc(100vh - 4rem);
                 }   
             `}</style>

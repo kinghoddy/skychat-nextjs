@@ -40,13 +40,14 @@ class Chat extends React.Component {
                       padding: 8px 12px;
                       line-height: 1.3;
                       margin-bottom : 0;
-                      word-wrap : break-word;
                       max-width : 80%;
                       display : flex;
                       flex-shrink : 0;
-                      white-space : pre-line
+                      white-space : pre-wrap;
+                      overflow-wrap : break-word;
                    }
                    .message article {
+                       width : 100%;
                    }
                    .skychat {
                        margin : 10px 0;
@@ -117,6 +118,19 @@ class Chat extends React.Component {
                      }
                    }
 
+                `}</style>
+                <style jsx global>{`
+                        body.dark  .received .message {
+                       background: #444 !important;
+                       color : #fff !important
+                     }
+                        body.dim  .received .message {
+                       background: #62686a !important;
+                       color : #fff !important
+                     }
+                     .message a {
+                         word-wrap : break-word !important;
+                     }
                 `}</style>
             </div>
         )

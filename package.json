@@ -10,10 +10,10 @@
   "dependencies": {
     "@ckeditor/ckeditor5-build-classic": "^19.0.2",
     "@ckeditor/ckeditor5-react": "^2.1.0",
-    "ckeditor4-react": "^1.1.1",
-    "firebase": "^7.15.4",
+    "ckeditor4-react": "^1.2.0",
+    "firebase": "^7.21.0",
     "jquery": "^3.5.1",
-    "next": "9.3.5",
+    "next": "^9.3.5",
     "react": "16.13.1",
     "react-dom": "16.13.1"
   }

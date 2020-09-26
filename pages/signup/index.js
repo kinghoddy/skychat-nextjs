@@ -223,7 +223,7 @@ class SignUp extends Component {
               />
               {!this.state.usernameExists && this.state.formData.username && this.state.formData.fullName && (
                 <button
-                  className="btn btn-login text-light"
+                  className="btn btn-fav text-light"
                 >
                   Finish
                 </button>
@@ -254,7 +254,7 @@ class SignUp extends Component {
                     <a>Login</a>
                   </Link>
                 </div>
-                <button className="text-light btn btn-login px-4">
+                <button className="text-light btn btn-fav  px-3">
                   Next <i className="fal fa-arrow-right"></i>
                 </button>
               </div>
@@ -262,7 +262,7 @@ class SignUp extends Component {
           )}
         {!this.state.setname && (
           <div className="mt-3">
-            <h6 className="px-2">You can also login with google</h6>
+            <h6 className="px-2">You can also signup with google</h6>
             <button onClick={this.googleLogin} className=" rounded-pill google">
               <img src="/img/google.png" />
               <span className="px-2">Continue with google</span>
@@ -271,6 +271,10 @@ class SignUp extends Component {
         )}
         <style>
           {`
+          
+          h3 ,p , div {
+            color : #000;
+          }
           .profile {
              text-align : center;
           }
@@ -292,16 +296,15 @@ class SignUp extends Component {
                 border-bottom : 2px solid #f73;
                 margin-bottom : 20px;
                 background : none;
+                color : #000
+            }
+            ::placeholder {
+              color : #777
             }
             form input:focus {
                 border-bottom : 2px solid #f20;
             }
-            .btn-login {
-                background : linear-gradient(to right , orange , red);
-                color : white;
-                height : 40px;
-                flex-shrink : 0;
-            }
+        
             .google:focus {
               outline : 0;
               background : #37a;
@@ -319,7 +322,9 @@ class SignUp extends Component {
                 color: #fff;
             }
             .google img {
-                height : 100%
+                height : 100%;
+                object-fit : contain;
+                max-width : 30px;
             }
         `}
         </style>

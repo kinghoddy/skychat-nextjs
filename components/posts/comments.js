@@ -16,7 +16,6 @@ export default class Comments extends Component {
     componentDidMount() {
         const ud = JSON.parse(localStorage.getItem('skychatUserData'))
         if (ud) {
-
             this.setState({ userData: ud });
             this.getComments(2, ud.uid);
         }
@@ -31,9 +30,12 @@ export default class Comments extends Component {
             let c = [];
             for (let key in s.val()) {
                 let d = {
+                    likes: {},
                     ...s.val()[key],
                     key
                 }
+
+
                 if (d.userData.uid === id) d.isMine = true
                 c.push(d)
             }
@@ -55,8 +57,41 @@ export default class Comments extends Component {
             userData: { ...this.state.userData },
             comment: text
         }
+        let n = {
+            title: com.userData.username + ' commented <small>' + text.substring(0, 20) + '</small>... on your post. ' + '<strong>' + this.props.post.body.substring(0, 40) + '</strong>..',
+            icon: this.props.post.media[0] && this.props.post.media[0].src || com.userData.profilePicture,
+            link: '/post/' + this.props.id,
+            date: Date.now()
+        }
         firebase.database().ref('posts/' + this.props.id + '/comments').push(com).then(() => {
-            play('success')
+            play('success');
+            if (!this.props.idMine) firebase.database().ref('users/' + this.props.uid + '/notification').push(n)
+
+        })
+    }
+    like = (e, cur) => {
+        e.preventDefault();
+        firebase.database().ref('posts/' + this.props.id + '/comments/' + cur.key + '/likes/' + this.state.userData.username).set(Date.now());
+    };
+    reply = (e, text, cur) => {
+        const ref = firebase.database().ref('posts/' + this.props.id + '/comments/' + cur.key + '/replies');
+        const com = {
+            date: Date.now(),
+            userData: { ...this.state.userData },
+            comment: text
+        }
+        let n = {
+            title: com.userData.username + ' replied ' + cur.userData.username + ' on your post. ' + '<strong>' + this.props.post.body.substring(0, 40) + '</strong>..',
+            icon: this.props.post.media[0] && this.props.post.media[0].src || com.userData.profilePicture,
+            link: '/post/' + this.props.id,
+            date: Date.now()
+        }
+
+        ref.push(com).then(() => {
+            play('sent');
+            if (!this.props.idMine) firebase.database().ref('users/' + this.props.uid + '/notification').push(n)
+            n.title = com.userData.username + ' replied your comment <small>' + cur.comment + '</small>';
+            firebase.database().ref('users/' + cur.userData.uid + '/notification').push(n);
         })
     }
     loadMore = () => {
@@ -80,7 +115,12 @@ export default class Comments extends Component {
                     <Spinner fontSize="2px" />
                 </div>}
                 <div className="comments" >
-                    {this.state.comments.map(cur => <Com delete={(e) => this.delete(e, cur.key)} key={cur.key} {...cur} />)}
+                    {this.state.comments.map(cur => <Com
+                        reply={(e, text) => this.reply(e, text, cur)}
+                        like={(e) => this.like(e, cur)}
+                        delete={(e) => this.delete(e, cur.key)}
+                        key={cur.key}
+                        {...cur} />)}
                 </div>
                 <Comment focus={this.props.focus} submit={this.sendComment} />
                 <style jsx>{`

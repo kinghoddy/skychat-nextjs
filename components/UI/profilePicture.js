@@ -10,6 +10,7 @@ const ProfilePicture = props => {
               height : ${props.size};
               width : ${props.size};
               position: relative;
+            flex-shrink : 0;
               background : #f7f8fc;
               border : 2px solid #e20;
           }

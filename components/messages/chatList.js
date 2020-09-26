@@ -78,14 +78,14 @@ class ChatList extends React.Component {
               .con h6 {
                   line-height: 10px;
                   font-weight : 700;
-                  color :${this.state.seen ? '#0007' : '#000'};
+                  color :${this.state.seen ? 'var(--gray-dark)' : 'var(--black)'};
               }
               .con p {
-                  color : ${this.state.seen ? '#0006' : '#000'};
+                  color : ${this.state.seen ? 'var(--gray-dark)' : 'var(--black)'};
                   font-weight : ${this.state.seen ? '400' : 700}
               }
               .con b {
-                  color : #0008;
+                  color : var(--dark);
                   font-weight : 600
               }
               .dot {

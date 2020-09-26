@@ -4,12 +4,11 @@ import ProfilePicture from '../UI/profilePicture';
 import Video from './video_full';
 import dateFormat from '../date';
 import Link from 'next/link'
-
+import Modal from '../UI/modal'
 const FullPosts = props => {
     const [showNav, setShowNav] = useState(true)
-    return props.show ? <React.Fragment>
-        <div className="backdrop" onClick={props.cancel} />
-        <div className={"animated fadeIn faster con " + (props.post.media.length === 1 ? 'one' : '')} >
+    return props.show ? <Modal cancel={props.cancel}>
+        <div className={"con " + (props.post.media.length === 1 ? 'one' : '')} >
             <div className="background" onClick={() => setShowNav(!showNav)} />
             <nav className={(showNav ? 'show' : '') + " d-flex align-items-center px-3 py-1"}>
                 <ProfilePicture src={props.post.icon} size='40px' online={props.post.online} />
@@ -27,7 +26,7 @@ const FullPosts = props => {
             </nav>
             <div className="overflow-auto" onClick={() => setShowNav(!showNav)} >
                 {props.post.media.map((cur, i) => <div className="image" >
-                    {cur.type === 'image' ? <Img objectFit="contain" maxHeight="90vh" alt="" src={cur.src} /> : <Video src={cur.src} />}
+                    {cur.type === 'image' ? <Img isFeed objectFit="contain" maxHeight="90vh" alt="" src={cur.src} /> : <Video src={cur.src} />}
                 </div>)}
             </div>
         </div>
@@ -37,7 +36,7 @@ const FullPosts = props => {
             top : -5rem;
             z-index : 1300;
             width : 100%;
-            color : #000;
+            color : var(--black);
             background : var(--white);
             transition : all .5s;
             box-shadow : 0 3px 6px #0002;
@@ -53,13 +52,9 @@ const FullPosts = props => {
             color : #fff;
         }
              .con {
-                 position : fixed;
-                 top : 0;
-                 left : 50%;
-                 transform : translateX(-50%);
-                 z-index : 1300;
                  height : 100vh;
                  width : 100vw;
+                 position : relative;
                  display : flex;
                  flex-direction : column ;
                  justify-content : ${props.post.media.length === 1 ? 'center' : 'unset'};
@@ -83,13 +78,13 @@ const FullPosts = props => {
                  width : 100%;
                  top : 0;
                  left : 0;
-                 z-index : -1
                 }
                 .one .background {
                     background :  url(${props.post.media[0].src}) #000;
                     background-size : cover;
+                    background-position  : center;
                     transform : scale(2);
-                 filter : blur(20px) brightness(80%) ;
+                 filter : blur(20px) brightness(60%) ;
              }
 
 
@@ -106,6 +101,6 @@ const FullPosts = props => {
              }
             }
         `}</style>
-    </React.Fragment> : null
+    </Modal> : null
 }
 export default FullPosts

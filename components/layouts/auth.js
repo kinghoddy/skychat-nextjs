@@ -9,7 +9,7 @@ export default (props) => {
       <Head>
         <title>{props.title}</title>
         <link rel="shortcut icon" href="/img/logo/logo_red.png" />
-        <meta property="og:image" content="/img/logo/logo_red.png" />
+        <meta property="og:image" content="/img/logo/icon-512.png" />
       </Head>
       <RouterLoader />
       <div className="row no-gutters">
@@ -92,6 +92,7 @@ export default (props) => {
           margin-right: 10px;
         }
       `}</style>
+
     </div>
   );
 };
