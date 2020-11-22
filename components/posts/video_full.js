@@ -20,6 +20,8 @@ const VideoPost = props => {
             video.current.onended = e => {
                 setPlay(false)
             }
+            video.current.onplay = props.setViewed
+
         }
     }
     React.useEffect(() => {

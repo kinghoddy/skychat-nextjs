@@ -33,7 +33,7 @@ export default class AddPost extends React.Component {
             const imgTypes = ['png', 'jpg', 'jpeg', 'gif'];
             const vidTypes = ['mp4', 'mpeg', 'webm', 'ogg'];
             let files = Array.from(fileInp.files);
-            let tempSrc = []
+            let tempSrc = [];
             files.forEach(cur => {
                 let cname = cur.name.toLowerCase().split('.');
                 let d = {
@@ -55,6 +55,7 @@ export default class AddPost extends React.Component {
                 }
             })
             this.setState({ tempSrc })
+            console.log(tempSrc);
         }
     }
     uploadTask = (file, callback, type) => {

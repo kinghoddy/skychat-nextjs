@@ -1,32 +1,56 @@
 import React from 'react';
 import ProfilePicture from '../UI/profilePicture';
 import date from '../date';
-import formatLink from '../formatLink'
+import FlipMove from 'react-flip-move'
+import formatLink from '../formatLink';
+import { fetchMetaData, getIvLinks } from '../getLinks';
+import ChatMeta from './ChatMeta';
+
 class Chat extends React.Component {
+    constructor(props) {
+        super(props);
+        this.message = React.createRef()
+    }
     state = {
-        receiver: {}
+        receiver: {},
+        fetched: null,
+        groupLink: null
     }
     componentDidUpdate() {
         if (this.props.receiver.uid !== this.state.receiver.uid) {
             this.setState({ receiver: { ...this.props.receiver } })
         }
     }
+    checkLinks = async () => {
+        const s = getIvLinks(this.message.current);
+        this.setState({ groupLink: s })
+        const meta = await fetchMetaData(this.message.current);
+        this.setState({ fetched: meta })
+    }
     componentDidMount() {
-        this.setState({ receiver: this.props.receiver })
+        this.setState({ receiver: this.props.receiver });
+        this.checkLinks()
     }
     render() {
         let classes = 'sent';
         if (this.props.sender === 'skychat') classes = "skychat"
         if (this.props.sender === 'time') classes = "time"
         if (this.props.sender === this.props.receiver.uid) classes = "received";
+        const seen = this.props.seen && this.props.seen[this.props.receiver.uid];
         return (
+
+
             <div className={"con " + classes} >
                 {this.props.showImg && <div className="icon" >
                     <ProfilePicture online={this.props.receiver.online} size="35px" src={this.props.receiver.profilePicture} />
                 </div>}
                 <div className="message" >
-
-                    <article dangerouslySetInnerHTML={{ __html: this.props.sender === 'time' ? date(this.props.message) : formatLink(this.props.message) }} ></article>
+                    {this.state.fetched && <ChatMeta {...this.state.fetched} />}
+                    {seen && <div className="tick" >
+                        <i className="fas fa-check-circle" />
+                    </div>}
+                    <article ref={this.message} dangerouslySetInnerHTML={{ __html: this.props.sender === 'time' ? date(this.props.message) : formatLink(this.props.message || '') }} ></article>
+                    {this.state.groupLink && <button className="group" >View Group</button>}
                 </div>
                 <style jsx>{`
                    .con {
@@ -42,10 +66,40 @@ class Chat extends React.Component {
                       margin-bottom : 0;
                       max-width : 80%;
                       display : flex;
+                      flex-direction : column;
                       flex-shrink : 0;
                       white-space : pre-wrap;
                       overflow-wrap : break-word;
                    }
+                   .group {
+                       width : 100%;
+                       background : #7773;
+                       padding : 5px;
+                       color : var(--info);
+                       margin-top : 10px;
+                       border-radius : 5px;
+                       transition : background .5s;
+                   }
+                   .group:active {
+                       background : var(--fav);
+                       color : #fff;
+                   }
+                
+                   .tick {
+                       position : absolute ;
+                       left : 10px;
+                       top : -7px;
+                       display : none;
+                       color : #fa0;
+                   }
+                   .tick i {
+                       font-size : 12px;
+                   }
+                   .received .tick {
+                       right : 10px;
+                       left : unset
+                   }
+                   .sent .tick {display : block}
                    .message article {
                        width : 100%;
                    }
@@ -69,13 +123,13 @@ class Chat extends React.Component {
              
                 .time .message {
                     margin: 10px auto;
-                      color: red;
+                      color: var(--gray-dark);
                       font-size : 12px;
                       white-space : nowrap;
+                      text-transform : uppercase;
                       padding : 10px 15px;
                       border-radius: 20px;
                        text-align: center;
-                      background: var(--white);
                     }
                  .received .message::after , .sent .message::after {
                      content : '';
@@ -120,22 +174,22 @@ class Chat extends React.Component {
 
                 `}</style>
                 <style jsx global>{`
-                        body.dark  .received .message {
-                       background: #444 !important;
-                       color : #fff !important
-                     }
-                        body.dim  .received .message {
-                       background: #62686a !important;
-                       color : #fff !important
-                     }
-                     .message a {
+                              body.dark .sent .message {
+                           background: #643 !important;
+                           color : #fff !important;
+                      }
+                      body.dim .sent .message {
+                           background: #643 !important;
+                           color : #fff !important;
+                      }
+                      .message a {
                          word-wrap : break-word !important;
                      }
                 `}</style>
             </div>
+
         )
     }
-
 }
 
 export default Chat

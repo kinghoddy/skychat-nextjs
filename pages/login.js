@@ -5,6 +5,8 @@ import firebase from "../firebase";
 import "firebase/auth";
 import "firebase/database";
 import Router from "next/router";
+import { isWindow } from "jquery";
+import ForgetPassword from "../components/forms/ForgetPassword";
 
 class Login extends React.Component {
   state = {
@@ -13,6 +15,7 @@ class Login extends React.Component {
       password: "",
     },
     error: null,
+    showForgetPassword: false,
     loading: false,
   };
   inputChanged = (e, types) => {
@@ -21,50 +24,28 @@ class Login extends React.Component {
     this.setState({ formData: form });
   };
   googleLogin = () => {
-    this.setState({ loading: true, sMessage: "Checking info" });
-
+    this.setState({
+      loading: true,
+      sMessage: "Checking info  !",
+      errorMessage: null,
+    });
     var provider = new firebase.auth.GoogleAuthProvider();
-    firebase
+    let action = () => firebase
       .auth()
-      .signInWithPopup(provider)
-      .then((result) => {
-        this.setState({ errorMessage: null, loading: false });
-        var user = result.user;
-        if (result.additionalUserInfo.isNewUser === true) {
-          firebase
-            .auth()
-            .currentUser.delete()
-            .then(() => {
-              this.setState({
-                loading: false,
-                error: (
-                  <span>
-                    "This Google account is not attached to any skychat account.
-                    <Link href="/signup">
-                      <a>Create an account instead</a>
-                    </Link>
-                  </span>
-                ),
-              });
-            });
-        } else {
-          this.fetchUser(user);
-        }
-      })
-      .catch((e) => {
-        var errorMessage = e.message;
-        this.setState({
-          error: (
-            <span>
-              <strong>Failed </strong>
-              {errorMessage}
-            </span>
-          ),
-          loading: false,
-        });
-      });
-  };
+      .signInWithPopup(provider).then(this.proceed).catch((error) => {
+        var errorMessage = error.message;
+        this.setState({ errorMessage: errorMessage, loading: false });
+      });;
+    if (window.Android) action = () => firebase.auth().signInWithRedirect(provider).then(function () {
+      return firebase.auth().getRedirectResult();
+    }).then(this.proceed).catch((error) => {
+      var errorMessage = error.message;
+      this.setState({ errorMessage: errorMessage, loading: false });
+    });
+    action()
 
+
+  };
   signInHandler = (event) => {
     event.preventDefault();
     this.setState({ loading: true, error: null });
@@ -85,7 +66,43 @@ class Login extends React.Component {
         // ...
       });
   };
+  proceed = (result) => {
+    this.setState({ loading: false })
+    if (result.credential) {
+      // This gives you a Google Access Token.
+      // You can use it to access the Google API.
+      var user = result.user;
+      if (result.additionalUserInfo.isNewUser === true) {
+        firebase
+          .auth()
+          .currentUser.delete()
+          .then(() => {
+            this.setState({
+              loading: false,
+              error: (
+                <span>
+                  "This Google account is not attached to any skychat account.
+                  <Link href="/signup">
+                    <a>Create an account instead</a>
+                  </Link>
+                </span>
+              ),
+            });
+          });
+      } else {
+        this.fetchUser(user);
+      }
+      // ...
+    }
+  }
 
+  componentDidMount() {
+    this.setState({ loading: true })
+    firebase.auth().getRedirectResult().then((result) => {
+      if (result) this.proceed(result)
+      else this.setState({ loading: false })
+    })
+  }
   fetchUser = (user) => {
     this.setState({ sMessage: "Logging in.." });
     var uid;
@@ -97,8 +114,7 @@ class Login extends React.Component {
       this.setState({ loading: false, error: error });
     }
     if (this.state.shouldLogin) {
-      localStorage.removeItem('skychatUserData');
-      localStorage.removeItem("skychatFeed");
+      localStorage.clear();
       var search = Router.query.route;
       if (search) {
         Router.push("/" + search);
@@ -107,12 +123,13 @@ class Login extends React.Component {
       }
     }
   };
-  componentDidMount() {
-    // firebase.auth().onAuthStateChanged();
-  }
+
   render() {
     return (
       <Layout title="Login | Skychat " loading={this.state.loading}>
+        {this.state.showForgetPassword && <ForgetPassword
+          cancel={() => this.setState({ showForgetPassword: false })}
+        />}
         <h3>Welcome Back</h3>
         <p>Login to your skychat account to continue</p>
         {this.state.error && (
@@ -138,7 +155,7 @@ class Login extends React.Component {
           />
           <div className="d-flex justify-content-between align-items-center">
             <div>
-              <a href="#">Forgot Password ?</a> <br />
+              <a href="#" onClick={() => this.setState({ showForgetPassword: true })} >Forgot Password ?</a> <br />
               <Link href="/signup">
                 <a>Create an account</a>
               </Link>
@@ -153,7 +170,7 @@ class Login extends React.Component {
             <span className="px-2">Continue with google</span>
           </button>
         </div>
-        <style>
+        <style jsx>
           {`
                   h3 ,p , div {
             color : #000;

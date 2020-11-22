@@ -26,7 +26,7 @@ const FullPosts = props => {
             </nav>
             <div className="overflow-auto" onClick={() => setShowNav(!showNav)} >
                 {props.post.media.map((cur, i) => <div className="image" >
-                    {cur.type === 'image' ? <Img isFeed objectFit="contain" maxHeight="90vh" alt="" src={cur.src} /> : <Video src={cur.src} />}
+                    {cur.type === 'image' ? <Img isFeed objectFit="contain" maxHeight="90vh" alt="" src={cur.src} /> : <Video setViewed={props.setViewed} src={cur.src} />}
                 </div>)}
             </div>
         </div>

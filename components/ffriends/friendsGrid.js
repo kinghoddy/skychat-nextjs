@@ -27,18 +27,30 @@ class Friends extends React.Component {
             let l = 0;
             ref.on('value', s => {
                 l = s.numChildren()
-                this.setState({ friendsLength: l })
+                this.setState({ friendsLength: l });
+                const f = { ...s.val() };
+                if (Object.fromEntries) {
+                    let o = Object.entries(f).sort((a, b) => {
+                        return b[1].localeCompare((a[1]))
+                    })
+                        .filter((cur, i, arr) => {
+                            return !i || cur[1] !== arr[i - 1][1]; // some irrelevant conditions here
+                        })
+                    let q = Object.fromEntries(o);
+                    firebase.database().ref(ref).set(q)
+                    // console.log(f, o);
+                }
+
             })
             ref.limitToLast(5).on('value', s => {
                 if (s.val()) {
-                    let arr = [];
-                    const friendsData = []
-                    for (let keys in s.val()) arr.push(s.val()[keys]);
-                    arr = arr.reverse()
+                    let arr = Object.values(s.val());
+                    const friendsData = [];
                     arr.forEach((cur, i) => {
                         firebase.database().ref('users/' + cur)
                             .once('value', snap => {
                                 if (snap.val() && snap.val().username) {
+
                                     const friend = {
                                         username: snap.val().username,
                                         src: snap.val().profilePicture,

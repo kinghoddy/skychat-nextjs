@@ -2,11 +2,20 @@ import React from 'react';
 import firebase from '../../firebase';
 import 'firebase/auth'
 import Link from '../UI/Link/link';
+import Messenger from '../UI/messenger';
+import ProfilePicture from '../UI/profilePicture';
 const MenuList = props => {
+    const [userData, setUserData] = React.useState({})
+    React.useEffect(() => {
+        const ud = localStorage.getItem('skychatUserData');
+        if (ud) setUserData(JSON.parse(ud))
+    }, [])
     const logOut = () => {
         firebase
             .auth()
-            .signOut()
+            .signOut().then(() => {
+                localStorage.clear()
+            })
     };
     return <div className=" sticky " >
         <nav className="navbar py-0" >
@@ -14,6 +23,18 @@ const MenuList = props => {
         </nav>
         <div className="px-3 py-2" >
 
+            <Link activeClassName="active" href="/messages" >
+                <a className="list" >
+                    <img src="/img/logo/logo_blue.png" className="mr-3" />
+                    <Messenger fontSize="11px" />
+                </a>
+            </Link>
+            <Link activeClassName="active" href="/[profile]" as={"/" + userData.username} >
+                <a className="list" >
+                    <ProfilePicture src={userData.profilePicture} size="26px" online />
+                    <span>Your Profile</span>
+                </a>
+            </Link>
             <Link activeClassName="active" href="/menu/edit-profile" >
                 <a className="list" >
                     <i className="fal fa-edit text-primary " />
@@ -24,6 +45,12 @@ const MenuList = props => {
                 <a className="list" >
                     <i className="fal fa-sun text-warning " />
                     <span>Display Settings</span>
+                </a>
+            </Link>
+            <Link activeClassName="active" href="/privacy" >
+                <a className="list" >
+                    <i className="fal fa-user-secret text-success " />
+                    <span>Privacy Policy</span>
                 </a>
             </Link>
             <button className="list" onClick={logOut} >
@@ -53,7 +80,12 @@ const MenuList = props => {
         }
           .list i {
               font-size : 23px;
-              margin-right : 12px;
+          }
+          .list img {
+              height : 28px;
+          }
+          .list span {
+              margin-left  : 12px
           }
  
         @media (min-width : 1200px) {

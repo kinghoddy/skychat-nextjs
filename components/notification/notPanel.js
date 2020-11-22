@@ -22,10 +22,10 @@ export default function NotPanel(props) {
         <div className="con" >
             {props.icon && <img className="icon" src={props.icon} />}
             <div className="pl-3 pan" >
-                {props.href && <Link href={props.href} onClick={cancel}>
-                    <a className="stretched-link"></a>
+                {props.href && <Link href={props.href} >
+                    <a onClick={cancel} className="stretched-link"></a>
                 </Link>}
-
+                {props.header && <h6 className="header" >{props.header}</h6>}
                 <h6 className="title" >{props.title}
                 </h6>
                 <p className="text" dangerouslySetInnerHTML={{ __html: props.text ? props.text.substring(0, 30) + '...' : '' }}></p>
@@ -62,14 +62,14 @@ export default function NotPanel(props) {
                 }
             }
                .con {
-                   background : var(--gray);
+                   background : var(--light);
                    border-radius : 3px;
-                   box-shadow : 0 5px 10px #0003;
+                   box-shadow : 0 3px 5px #0003;
                    position : fixed;
                    left : 50%;
                    top : 10px;
                    animation : in in 1s ;
-                   z-index : 1250;
+                   z-index : 1300;
                    width : 90%;
                    transform : translateX(-50%);
                    margin-left : ${show ? '0' : '-10rem'};
@@ -91,19 +91,29 @@ export default function NotPanel(props) {
                }
                .title {
                    text-transform : capitalize;
-                   margin-bottom : 0;
+                   margin-bottom : 3px;
+                   font-weight  : 700;
                    display : flex;
                }
-               .date {
-                   text-transform : lowercase;
-                   color : var(--dark);
+               .header {
+                   color : var(--warning);
                    font-weight : 600;
+                   margin : 0;
+                   text-transform : uppercase;
+               }
+               .date {
+                   text-transform : uppercase;
+                   color : var(--gray-dark);
+                   font-weight : 700;
                    display : block;
-                   font-size : 12px;
+                   font-size : 11px;
                }
                .text {
                    margin-bottom : 0;
-                   }
+                   font-size : 13px;
+                   color : var(--gray-dark);
+                   line-height : 1.4
+                }
                    .fa-bell {
                        color : #7777;
                    }

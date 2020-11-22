@@ -1,19 +1,18 @@
 import React from 'react';
 
-export default function Splashscreen(props) {
-    const [hide, setHide] = React.useState(false);
-    React.useEffect(() => {
-        setTimeout(() => {
+export default function Splashscreen({ hide }) {
 
-            setHide(true)
-        }, props.time)
-    }, [props.time])
     return <div className={"splash " + (hide ? 'hide' : '')} >
+        <div className="text-center" >
 
-        <div className="text-center w-100" >
-            <img src="/img/logo/skychat_red.png" className="logo_light" />
-            <img src="/img/logo/skychat_light_1.png" className="logo_dark" />
+            <img src="/img/logo/logo_red.png" className=" logo dark" />
+            <h6 className="text-muted mt-2">Starting Skychat</h6>
+            <div className="progress" >
+                <span className="animated slideInLeft infinite w-100 bg-primary" />
+            </div>
         </div>
+
+
         <style jsx>{`
                .splash {
                    background : var(--white);
@@ -26,32 +25,28 @@ export default function Splashscreen(props) {
                    height : 100vh;
                    transition : all .3s;
                    align-items : center;
+                   justify-content : center;
                }
-               .splash.hide {
-                   visibility : hidden ;
+               .hide {
                    opacity : 0;
+                   visibility : hidden
                }
-               .logo_dark {
-                   display : none;
+               .logo {
+                   height : 3rem;
                }
-               img {
-                    width : 80%;
-                    max-width : 16rem;
+               .progress {
+                   height : 5px;
                }
+               .progress span {
+                   animation-duration : 2s;
+               }
+  
         `}</style>
-        <style jsx global>{`
-                body.dark .logo_dark {
-                    display : inline;
-                }
-                body.dim .logo_dark {
-                    display : inline;
-                }
-                body.dark .logo_light {
-                    display : none;
-                }
-                body.dim .logo_light {
-                    display : none;
-                }
+        <style global jsx>{`
+            body {
+                overflow : ${hide ? 'auto' : 'hidden'} 
+            }
+ 
         `}</style>
     </div>
 }

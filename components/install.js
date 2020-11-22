@@ -1,9 +1,18 @@
 import React, { Component } from 'react'
 
 export default class Install extends Component {
+    constructor(props) {
+        super(props);
+        this.installBtn = React.createRef()
+    }
     state = {
         show: false,
         installing: false
+    }
+    componentWillUnmount() {
+        const buttonInstall = this.installBtn.current;
+
+        if (buttonInstall) buttonInstall.removeEventListener('click')
     }
     componentDidMount() {
         let deferredPrompt;
@@ -14,8 +23,8 @@ export default class Install extends Component {
             deferredPrompt = e;
             // Update UI notify the user they can install the PWA
             this.setState({ show: true })
-            const buttonInstall = document.getElementById('installBtn');
-            buttonInstall.addEventListener('click', (e) => {
+            const buttonInstall = this.installBtn.current;
+            if (buttonInstall) buttonInstall.addEventListener('click', (e) => {
                 // Hide the app provided install promotion
                 this.setState({ installing: true })
                 // Show the install prompt
@@ -57,7 +66,7 @@ export default class Install extends Component {
                             Hello fam !! <br /> Skychat has unlocked the secret of the web. 💪 💪
                     Add skychat to your home screen and easily access it anytime in less than 10 sec;
                 </p>
-                        <button id="installBtn" className="btn rounded-pill btn-fav btn-block" >Install now</button>
+                        <button ref={this.installBtn} id="installBtn" className="btn rounded-pill btn-fav btn-block" >Install now</button>
                     </React.Fragment>}
 
             </div>

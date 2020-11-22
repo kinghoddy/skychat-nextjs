@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import LazyLoad from 'react-lazyload';
 const VideoPost = props => {
 
     const video = React.useRef();
@@ -18,11 +19,14 @@ const VideoPost = props => {
             video.current.onended = e => {
                 setPlay(false)
             }
+            video.current.onplay = props.setViewed
         }
     }
     React.useEffect(() => {
-        watchScroll();
-        window.addEventListener('scroll', watchScroll)
+        if (!props.cancelAutoPlay) {
+            watchScroll();
+            window.addEventListener('scroll', watchScroll)
+        }
         return function cleanUp() {
             window.removeEventListener('scroll', watchScroll)
         }
@@ -48,11 +52,13 @@ const VideoPost = props => {
     };
 
     return <div className="con"  >
+
         <video onClick={(e) => {
             e.target.pause();
             setPlay(false);
             props.show();
-        }} style={{ ...props.style }} ref={video} src={props.src}></video>
+        }} style={{ ...props.style }} preload="auto" playsInline={true} ref={video} src={props.src}></video>
+
         <div className="controls">
             <button onClick={playPause}>
                 <i className={"fal fa-" + (play ? 'pause' : 'play')} />
@@ -61,6 +67,7 @@ const VideoPost = props => {
                 <i className={"fal fa-volume-" + (muted ? 'mute' : 'up')} />
             </button>
         </div>
+
         <style jsx>
             {`
             .con {
@@ -97,6 +104,8 @@ const VideoPost = props => {
                 color : #fff;
             }
             `} </style>
+
     </div>
+
 }
 export default VideoPost

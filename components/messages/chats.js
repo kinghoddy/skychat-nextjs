@@ -5,6 +5,10 @@ import Router from 'next/router';
 import firebase from '../../firebase';
 import 'firebase/database';
 import ChatList from './chatList';
+import SwipableTab from '../UI/swipable-tab';
+import GroupsLisView from './group/groupListView';
+import Search from '../forms/search';
+import FlipMove from 'react-flip-move'
 import Spinner from '../UI/Spinner/Spinner';
 class Chats extends React.Component {
     constructor(props) {
@@ -14,8 +18,11 @@ class Chats extends React.Component {
     state = {
         search: '',
         uid: '',
+        tab: '',
         loadCount: 12,
-        chats: []
+        chats: [],
+        searching: null,
+        searchRes: []
     }
     componentDidUpdate() {
         if (this.props.uid !== this.state.uid) {
@@ -24,14 +31,14 @@ class Chats extends React.Component {
         }
     }
     componentWillUnmount() {
-        this.watch.current.removeEventListener('scroll', this.loadMore, false);
+        document.getElementById('chats').removeEventListener('scroll', this.loadMore, false);
     }
     componentDidMount() {
         const ud = JSON.parse(localStorage.getItem('skychatUserData'))
         if (ud) {
             this.setState({ uid: ud.uid })
             this.getChats(ud.uid);
-            this.watch.current.addEventListener('scroll', this.loadMore, false)
+            document.getElementById('chats').addEventListener('scroll', this.loadMore, false)
         }
     }
     loadMore = () => {
@@ -51,18 +58,28 @@ class Chats extends React.Component {
         this.setState({ loading: true });
         var ref = db.ref("users/" + uid + "/chats");
         ref.on("value", s => {
-            var chatArr = [];
-            var chatsId = s.val();
+            let chatArr = [];
+            let chatsId = s.val();
             if (chatsId) {
-                for (let keys in chatsId) {
-                    const cur = chatsId[keys];
-                    chatArr.push(cur)
+                if (Object.fromEntries) {
+
+                    let p = Object.fromEntries(Object.entries(s.val()).sort((a, b) => a[1].localeCompare(b[1]))
+                        .filter((cur, i, arr) => !i || cur[1] !== arr[i - 1][1])
+                    );
+                    chatsId = p
+                    ref.set(p)
                 }
+                chatArr = Object.values(chatsId)
                 const chatsRef = firebase.database().ref('chats');
                 const chats = [];
                 chatArr.forEach(cur => {
                     chatsRef.child(cur + '/metadata').once('value', snapshot => {
                         chatsRef.child(cur + '/chats/').limitToLast(1).on('value', snap => {
+                            if (!snap.val()) chatsRef.child(cur + '/chats/').push({
+                                date: Date.now(),
+                                sender: 'skychat',
+                                message: 'You are now connected together. Enjoy messaging in the clouds '
+                            })
                             for (let key in snap.val()) {
                                 chats.forEach((current, i) => {
                                     if (current.id === cur) {
@@ -79,7 +96,7 @@ class Chats extends React.Component {
                                     id: cur,
                                 });
 
-                                if (chats.length >= chatArr.length) {
+                                if (chats.length >= chatArr.length - 1) {
                                     setTimeout(() => {
                                         this.setState({ chats, loading: false });
                                         localStorage.setItem('skychatMessages', JSON.stringify(chats))
@@ -95,87 +112,156 @@ class Chats extends React.Component {
             }
         });
     }
+    search = (q) => {
+        const chats = [...this.state.chats];
+        const res = chats.map(cur => {
+            let d = JSON.stringify(cur).toLowerCase();
+            if (d.indexOf(q) > -1) return cur;
+        }).filter(cur => cur !== undefined);
+        this.setState({ searchRes: res, searching: q });
+    }
     render() {
-        let c = this.state.chats;
+        let c = [...this.state.chats];
         c.sort((a, b) => b.date - a.date)
 
-        return <div className="wrapper" ref={this.watch}>
-            <nav className="px-3 py-1 navbar  sticky-top navbar-light   navbar-expand" >
-                <div className="navbar-brand  " >
-                    <button className="nav-link mr-2" onClick={() => Router.push('/feed')} >
-                        <i className="fa fa-arrow-left" />
-                    </button>
-                    <ProfilePicture src={this.props.profilePicture} size="30px" />
-                    <h4 className="mb-0 ml-2" >Chats</h4>
+        return <div className="wrapper" ref={this.watch} >
+            <nav id="mainNav" className="px-3 py-1 navbar  navbar-light   navbar-expand" >
+                <button className="back-button mr-2" onClick={() => Router.push('/feed')} >
+                    <i className="fa fa-arrow-left" />
+                </button>
+                <div className="navbar-brand" >
+                    <ProfilePicture noBorder src={this.props.profilePicture} size="36px" />
+                    {/* <small className="ml-2" >{this.props.username}</small> */}
                 </div>
                 <div className="collapse navbar-collapse" >
                     <ul className="navbar-nav ml-auto" >
-                        <li className="nav-item" >
-                            <Link href="#" >
-                                <a className="nav-link" >
-                                    <i className="fa fa-cog" />
-                                </a>
-                            </Link>
-                        </li>
-                        <li className="nav-item" >
-                            <Link href="#" >
-                                <a className="nav-link" >
-                                    <i className="fa fa-plus" />
-                                </a>
-                            </Link>
-                        </li>
+                        <i className="nav-item" >
+                            <button className="back-button" >
+                                <i className="fa fa-ellipsis-h" />
+                            </button>
+                        </i>
                     </ul>
                 </div>
+
             </nav>
-            <div className="px-3 " >
-                {this.state.loading && <div className="spinner" >
-                    <div className="spinner-grow mr-2 " />
-                    Connecting....</div>}
-                <form action="#" className="search" >
-                    <input type="text" placeholder="Search..." value={this.state.search} onChange={e => this.setState({ search: e.target.value })} />
-                    <button>
-                        <i className="fal fa-search"></i>
-                    </button>
-                </form>
-                {this.state.chats.map((cur, i) => i < this.state.loadCount && <ChatList key={cur.id} {...cur} uid={this.props.uid} />)}
-                <div id='watch'>
-                    {!this.state.loading && <p className="text-center my-2"  >
-                        {this.state.chats.length > 0 ? 'No more chats' : 'No chats yet'}
-                    </p>}
-                </div>
+
+
+            <div className="tabs" >
+                <SwipableTab
+                    type="tabs"
+                    position="bottom"
+                    activeColor="#f30"
+                    onTabChanged={(id) => this.setState({ tab: id })}
+                    tabNav={[{
+                        id: 'chats',
+                        text: <React.Fragment>
+                            <i className="tab-icon fa fa-comment" />
+                            <h6 className="tab-title" >Chats</h6>
+                        </React.Fragment>
+                    }, {
+                        id: "groups",
+                        text: <React.Fragment>
+                            <i className="tab-icon fa fa-users" />
+                            <h6 className="tab-title" >Groups</h6>
+                        </React.Fragment>
+                    }]}
+                    tabContent={[
+                        {
+                            id: 'chats',
+                            component: <React.Fragment>
+                                <nav id="chatNav" className=" px-3 py-1 navbar  navbar-light   navbar-expand" >
+                                    <div className="navbar-brand  " >
+                                        <h4 className="mb-0 ml-2 text-capitalize" >Chats</h4>
+                                        {this.state.loading && <div className="spinner">
+                                            <Spinner fontSize="2px" />
+                                        </div>}
+                                    </div>
+                                    <div className="collapse navbar-collapse" >
+                                        <ul className="navbar-nav ml-auto" >
+
+                                            <li className="nav-item" >
+                                                <Link href="#" >
+                                                    <a className="nav-link" >
+                                                        <i className="fa fa-plus mr-1" />
+                                                        <span className="pr-2" >
+                                                            Start chat
+                                                        </span>
+                                                    </a>
+                                                </Link>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </nav>
+                                <Search
+                                    cancel={() => this.setState({ searching: null })}
+                                    onSubmit={this.search}
+                                />
+                                <FlipMove
+                                    staggerDelayBy="100"
+                                    enterAnimation="accordionVertical"
+                                >
+                                    {this.state.searching ? <React.Fragment>
+
+                                        {this.state.searchRes.map(cur => <ChatList key={cur.id} {...cur} uid={this.props.uid} />)}
+                                        <p className="text-center" >{this.state.searchRes.length > 0 ? 'No more results' :
+                                            `No results found for  "${this.state.searching}"`}</p>
+                                    </React.Fragment>
+                                        : c.map((cur, i) => i < this.state.loadCount && <ChatList key={cur.id} {...cur} uid={this.props.uid} />)}
+                                </FlipMove>
+                                <div id='watch'>
+                                    {!this.state.loading && !this.state.searching && <p className="text-center my-2"  >
+                                        {this.state.chats.length > 0 ? 'No more chats' : 'No chats yet'}
+                                    </p>}
+                                </div>
+                            </React.Fragment>
+                        }, {
+                            id: 'groups',
+                            component: <GroupsLisView {...this.props} />
+                        }
+                    ]}
+                />
+
             </div>
             <style jsx>{`
                 .wrapper {
                     width : 100%;
+                    display : flex;
+                    flex-direction : column;
+                    overflow : hidden;
+                    position : relative;
                     height : 100%;
-                    overflow : auto;
-                    background : var(--white);
+                    background : var(--gray);
                 }
-                .wrapper::-webkit-scrollbar{
-                    width : 0px;
-                
-                }
-                nav {
-                    background : var(--white);
-                    margin-bottom : 15px;
+               .spinner {
+                    height : 20px;
+                    width : 20px;
+                    margin : 0 10px;
                 }
                 .navbar-brand {
                     display : flex;
                     align-items : center;
                 }
+                .navbar-brand small {
+                    font-weight : 600;
+                    color : var(--gray-dark)
+                }
                 .nav-item {
                     margin : 0 5px;
                 }
                 .nav-link {
-                    background : #0001;
+                    background : var(--light);
                     height : 40px;
                     padding : 0;
                     display : flex;
                     align-items : center;
                     justify-content : center;
-                    width : 40px;
+                    min-width : 40px;
                     color : var(--black);
-                    border-radius : 50%;
+                    border-radius : 20rem;
+                }
+                #mainNav {
+                    position : relative;
+                    z-index : 500
                 }
                 .nav-link i {
                     font-size : 20px;
@@ -188,50 +274,28 @@ class Chats extends React.Component {
                 .spinner .spinner-grow {
                     color : #f20;
                 }
-                .search {
-                       border-radius : 20px;
-                       display : flex;
-                       background : #ff220022;
-                       overflow : hidden;
-                       height : 2.5rem;
-                       margin : 10px 0px;
-                   }
-                   .search > * {
-                       align-self : stretch;
-                       border : 0;
-                       outline : 0;
-                       background : none;
-                       color : var(--black);
+                   .tabs {
+                       position : absolute;
+                       height : 100%;
                        transition : all .3s;
+                       padding-top : 3.6rem;
+                       width : 100%;
                     }
-                    .search input {
-                        width : calc(100% - 35px);
-                       padding : 0 15px;
-                   }
-                   ::placeholder {
-                       color : var(--gray-darky);
-                   }
-                   .search button {
-                       width : 35px;
-                   }
-                   .search button:hover {
-                       background : #ff220044 ;
-                   }
-
+                    .tab-icon {
+                        font-size : 30px;
+                    }
+                    .tab-title {
+                        font-weight : 700;
+                        margin-bottom : 0;
+                    }
             `}</style>
             <style jsx global>{`
             body.dark .wrapper {
                 background : #000
             }
-             body.dim .search{
-                  background : var(--gray);
-              }
-             body.dark .search{
-                  background : var(--gray);
-              }
-                     body.dark nav {
-                    background : #000;
-                }
+            body.dim .wrapper {
+                background : #001119;
+            }
             `}</style>
         </div>
     }

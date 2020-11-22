@@ -143,7 +143,7 @@ const CoverProfile = props => {
             {loaded && <Img src={props.coverPhoto} />}
         </div>
         <div className="profile">
-            {loaded && <ProfilePicture size="100px" src={props.profilePicture} online={props.connections} />}
+            {loaded && <ProfilePicture color="var(--white)" size="120px" src={props.profilePicture} online={props.connections} />}
             <div className="names">
 
                 <h3>{props.fullName}</h3>
@@ -205,10 +205,13 @@ const CoverProfile = props => {
             position : relative;
             box-shadow: 0 0px 3px 2px #0001;
             background : var(--white);
+            padding : 1px;
         }
         .cover {
-            height : 14rem;
-            width : 100%;
+            height : 15rem;
+            margin : 10px;
+            overflow : hidden;
+            border-radius : 15px;
         }
         .profile {
             display : flex;

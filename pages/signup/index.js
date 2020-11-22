@@ -35,47 +35,64 @@ class SignUp extends Component {
       errorMessage: null,
     });
     var provider = new firebase.auth.GoogleAuthProvider();
-    firebase
+    let action = () => firebase
       .auth()
-      .signInWithPopup(provider)
-      .then((result) => {
-        var user = result.user;
-        const id = user.uid;
-        firebase
-          .database()
-          .ref("users")
-          .once("value", (s) => {
-            if (s.val()[id]) {
-              this.setState({
-                loading: false,
-                userExist: true,
-                errorMessage: (
-                  <div>
-                    <img
-                      src={s.val()[id].profilePicture}
-                      style={{ height: "50px", width: "50px" }}
-                      className="rounded-circle"
-                      alt=""
-                    />
-                    User {s.val()[id].username} already exists. You can
-                    <Link href="/feed">
-                      <a> Login </a>
-                    </Link>
-                    to continue
-                  </div>
-                ),
-              });
-            } else {
-              this.setState({ loading: false });
-              this.setState({ setname: true, profilePicture: user.photoURL });
-            }
-          });
-      })
-      .catch((error) => {
+      .signInWithPopup(provider).then(this.proceed).catch((error) => {
         var errorMessage = error.message;
         this.setState({ errorMessage: errorMessage, loading: false });
-      });
+      });;
+    if (window.Android) action = () => firebase.auth().signInWithRedirect(provider).then(function () {
+      return firebase.auth().getRedirectResult();
+    }).then(this.proceed).catch((error) => {
+      var errorMessage = error.message;
+      this.setState({ errorMessage: errorMessage, loading: false });
+    });
+    action()
+
+
   };
+  proceed = (result) => {
+    var user = result.user;
+    const id = user.uid;
+    firebase
+      .database()
+      .ref("users")
+      .once("value", (s) => {
+        if (s.val()[id]) {
+          this.setState({
+            loading: false,
+            userExist: true,
+            errorMessage: (
+              <div>
+                <img
+                  src={s.val()[id].profilePicture}
+                  style={{ height: "50px", width: "50px" }}
+                  className="rounded-circle"
+                  alt=""
+                />
+                    User {s.val()[id].username} already exists. You can
+                <Link href="/feed">
+                  <a> Login </a>
+                </Link>
+                    to continue
+              </div>
+            ),
+          });
+        } else {
+          this.setState({ loading: false });
+          this.setState({ setname: true, profilePicture: user.photoURL });
+        }
+      });
+  }
+
+  componentDidMount() {
+    this.setState({ loading: true })
+    firebase.auth().getRedirectResult().then((result) => {
+      if (result) this.proceed(result)
+      else this.setState({ loading: false })
+    }).catch(() => this.setState({ loading: false }))
+  }
+
   saveUser = (e) => {
     e.preventDefault();
     // this.setUserName(this.state.formData.username);
@@ -126,8 +143,12 @@ class SignUp extends Component {
     let userExists
     this.setState({ nameLoading: true });
     var ref = firebase.database().ref("users/");
+    const routes = [
+      'menu', 'messages', 'highlights', 'notifications', 'post', 'login', 'signup', 'feed', 'vc', 'privacy'
+    ]
     setTimeout(() => {
-      ref.orderByChild('username').equalTo(this.state.formData.username).once('value', s => {
+      if (routes.indexOf(this.state.formData.username) > -1) this.setState({ usernameExists: true, nameLoading: false });
+      else ref.orderByChild('username').equalTo(this.state.formData.username).once('value', s => {
         if (s.val()) userExists = true;
         else userExists = false
         this.setState({ usernameExists: userExists, nameLoading: false });
@@ -221,7 +242,7 @@ class SignUp extends Component {
                 required
                 placeholder="Full name"
               />
-              {!this.state.usernameExists && this.state.formData.username && this.state.formData.fullName && (
+              {!this.state.usernameExists && !this.state.nameLoading && this.state.formData.username && this.state.formData.fullName && (
                 <button
                   className="btn btn-fav text-light"
                 >
@@ -337,5 +358,4 @@ const sanitize = (text = '') => {
   let sanitizedText = text.replace(/[-[\]{}();:'"@=<>*+?.,\\^$|#\s]/g, '').trim().toLowerCase();
   return sanitizedText
 }
-
 export default SignUp;

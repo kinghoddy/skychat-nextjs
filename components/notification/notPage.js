@@ -61,9 +61,11 @@ export default class NotPage extends React.Component {
             <div className="con">
                 <nav>
                     <h6 className=" h5 mb-0">Notifications</h6>
-                    {this.state.loading && <div style={{ width: '4rem' }} >
+                    {this.state.loading ? <div style={{ width: '4rem' }} >
                         <Spinner fontSize="2px" />
-                    </div>}
+                    </div> : <button className="btn-default" onClick={e => this.getNots(this.state.userData.uid)} >
+                            <i className="fal fa-redo" />
+                        </button>}
                 </nav>
 
 
@@ -90,7 +92,6 @@ export default class NotPage extends React.Component {
                        top : 2.8rem;
                        z-index : 1000;
                        background : inherit;
-                       border-bottom : 1px solid var(--gray);
                    }
                    .cat {
                         padding : 10px 0;

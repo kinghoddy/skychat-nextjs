@@ -1,4 +1,4 @@
-import Document, { Head, Main, NextScript } from "next/document";
+import Document, { Html, Head, Main, NextScript } from "next/document";
 export default class MyDocument extends Document {
   static async getInitialProps(ctx) {
     const initialProps = await Document.getInitialProps(ctx)
@@ -6,7 +6,7 @@ export default class MyDocument extends Document {
   }
   render() {
     return (
-      <html>
+      <Html>
         <Head>
           <meta name="author" content="Sogbuyi Noel Odunmilade" />
           <meta name="keywords" content="skychat kinghoddy sky-chat" />
@@ -27,8 +27,8 @@ export default class MyDocument extends Document {
           <link
             href="https://fonts.googleapis.com/css?family=Architects+Daughter|Gochi+Hand|Montserrat+Alternates:200,300,400,500,700,800|Source+Sans+Pro&display=swap"
             rel="stylesheet"
-
           />
+          <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;300;400;500;600;700&display=swap" rel="stylesheet" />
 
         </Head>
         <body >
@@ -36,7 +36,7 @@ export default class MyDocument extends Document {
           <NextScript />
         </body>
         <script src="/js/main.js"></script>
-      </html>
+      </Html>
     );
   }
 }

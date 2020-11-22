@@ -9,6 +9,7 @@ import Info from '../../components/profileInfo';
 import Spinner from '../../components/UI/Spinner/Spinner';
 import Requests from '../../components/ffriends/requests';
 import AddPost from '../../components/forms/addPost';
+import SharePop from '../../components/posts/share-pop';
 export default class Timeline extends React.Component {
     state = {
         userData: {
@@ -75,8 +76,7 @@ export default class Timeline extends React.Component {
         posts.sort((a, b) => {
             return b.date - a.date;
         });
-        return <Layout broken={this.state.broken} stay title={(this.props.d.username !== undefined ? this.props.d.username.toUpperCase() : 'View profile') + " | Skychat"} src={this.props.d.profilePicture} >
-
+        return <Layout notProps={this.props.notProps} broken={this.state.broken} stay title={(this.props.d.username !== undefined ? this.props.d.username.toUpperCase() : 'View profile') + " | Skychat"} src={this.props.d.profilePicture} >
 
             <div className="px-lg-1 pt-0 pt-lg-2 cover" >
                 <div className='mb-1 ' >

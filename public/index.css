@@ -8,14 +8,33 @@ body {
   overflow-x: hidden;
   color: var(--black);
   scroll-behavior: smooth;
-  touch-action: pan-y;
+  user-zoom: none;
+  /* user-select: none; */
+}
+.no-interaction {
+  user-select: none;
 }
 
 ::-webkit-scrollbar {
-  width: 0.6rem;
+  /* width: 20px; */
+  background: transparent;
+}
+::-webkit-scrollbar-corner {
+  background: transparent;
+  height: 16px;
+  width: 16px;
+}
+::-webkit-scrollbar-button {
+  height: 0;
+  width: 0;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgb(187, 187, 187);
+  background: content-box currentColor;
+  border: 6px solid transparent;
+  border-radius: 18px;
+  color: #777;
+  min-height: 60px;
+  min-width: 60px;
 }
 .backdrop {
   position: fixed;
@@ -29,7 +48,13 @@ body {
 p {
   line-height: 1.75;
 }
-
+.back-button {
+  background: none;
+  color: var(--black);
+}
+.back-button > * {
+  color: inherit;
+}
 .inLink {
   font-weight: 400;
   color: #2c7bbd;
@@ -47,7 +72,12 @@ a:hover {
   background: linear-gradient(to right, #f10, #ffa500);
   color: #fff !important;
   white-space: nowrap;
+  border: 0;
   transition: all 0.3s;
+}
+.btn-fav:focus {
+  box-shadow: none;
+  background: linear-gradient(to right, #f80, #fe1);
 }
 .btn-fav:hover {
   background: linear-gradient(to right, #f50, #fc1);
@@ -60,17 +90,21 @@ h4 {
   font-weight: 600;
   color: var(--black);
 }
+h6 {
+}
+/* font-family: "Montserrat", sans-serif; */
 
 h3,
 h2 {
   text-transform: capitalize;
+  /* font-family: "Gochi Hand", cursive; */
   font-family: "Architects Daughter", cursive;
   font-weight: bolder;
   color: var(--black);
 }
 
 h1 {
-  font-family: "Gochi Hand", cursive;
+  font-family: "Montserrat", sans-serif;
   font-size: 38px;
   color: var(--black);
 }
@@ -95,8 +129,27 @@ img::-moz-selection {
 }
 .btn,
 a {
-  font-family: Montserrat, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
     "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
     "Segoe UI Symbol", "Noto Color Emoji";
   font-weight: 700;
+}
+.btnIn {
+  animation: btnIn 0.5s both ease-out;
+}
+@keyframes btnIn {
+  0% {
+    transform: translateY(60px);
+    opacity: 0;
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(-10px) scale(1.2);
+  }
+  80% {
+    transform: translateY(-10px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
 }

@@ -38,16 +38,21 @@ export default (props) => {
             position: fixed;
             top: 0;
             left: 0;
-            height: 100vh;
             width: 100vw;
+            background : none;
             z-index: 1900;
-            background: ${props.noShow ? 'none' : '#ffffffcc'};
           }
           .routing-progress {
             background: linear-gradient(to right, red, orange);
             height: 5px;
             width: ${routerWidth}%;
             transition: all 1s;
+
+          }
+          @media (min-width : 760px) {
+            .routing {
+            background: ${props.noShow ? 'none' : '#ffffffcc'};
+            }
           }
         `}</style>
       </div>

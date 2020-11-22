@@ -7,7 +7,9 @@ import Chat from './chat.js'
 import date from '../date';
 import Router from 'next/router'
 import Send from '../forms/send';
+import CallRoom from '../vc/callRoom'
 import play from '../Audio/Audio';
+import Toast from '../UI/Toast/Toast'
 
 class Chatroom extends Component {
     constructor(props) {
@@ -18,10 +20,16 @@ class Chatroom extends Component {
     state = {
         userData: {},
         receiver: {
-            username: ''
+            username: '',
+            coverPhoto: '',
         },
+        showCall: null,
         chatId: null,
-        chats: []
+        chats: [],
+        count: -1
+    }
+    createCall = (type) => {
+        this.setState({ showCall: type })
     }
     componentDidUpdate() {
 
@@ -32,17 +40,30 @@ class Chatroom extends Component {
         }
     }
     componentWillUnmount() {
+        this.chats.current.removeEventListener('scroll', this.loadMore);
         firebase.database().ref('chats/' + this.state.chatId + '/chats').off('value', this.loadChats, false);
         firebase.database().ref('chats/' + this.state.chatId + '/chats').off('child_added', this.play, false);
+    }
+    loadMore = () => {
+        document.activeElement.blur();
+        let c = this.state.count;
+        const watch = document.getElementById('chat_watch').getBoundingClientRect().top
+        const watch2 = this.chats.current.getBoundingClientRect().top - 200;
+        if (watch > watch2) {
+            if (c > 0) {
+                c -= 10;
+                this.setState({ count: c })
+            }
+
+        }
     }
     componentDidMount() {
         if (window.innerWidth < 1000) {
             this.setState({ isPhone: true })
         }
-
         const ud = JSON.parse(localStorage.getItem('skychatUserData'))
         if (ud) this.setState({ userData: ud });
-
+        this.chats.current.addEventListener('scroll', this.loadMore, false)
     }
     getReceiverData = id => {
         let data = JSON.parse(localStorage.getItem('skychatChat=' + id))
@@ -56,11 +77,13 @@ class Chatroom extends Component {
                     uid: id,
                     online: s.val().connections,
                     lastOnline: s.val().lastOnline,
+                    coverPhoto: s.val().coverPhoto,
                     profilePicture: s.val().profilePicture,
                 }
                 let d = {
                     receiver: { ...receiver }
                 }
+                let data = JSON.parse(localStorage.getItem('skychatChat=' + id))
                 if (data) {
                     d = {
                         ...data,
@@ -72,6 +95,12 @@ class Chatroom extends Component {
             }
         })
     }
+    setToast = (toast) => {
+        this.setState({ toast })
+        setTimeout(() => {
+            this.setState({ toast: null })
+        }, 8000)
+    }
     getChat = (id) => {
 
         let chatId = this.state.userData.uid + '&' + id;
@@ -81,11 +110,11 @@ class Chatroom extends Component {
         this.setState({ chatId })
         firebase.database().ref('chats/' + chatId + '/chats').limitToLast(1).on('child_added', this.play, false)
         let data = JSON.parse(localStorage.getItem('skychatChat=' + id))
-        if (data) if (data.chats) this.setState({ chats: data.chats })
-        setTimeout(() => {
-            this.chats.current.scrollTop = this.chats.current.scrollHeight + 10000
-        }, 50)
+        if (data) if (data.chats) this.setState({ chats: data.chats, count: data.chats.length - 20 });
 
+        setTimeout(() => {
+            if (this.chats.current) this.chats.current.scrollTop = this.chats.current.scrollHeight + 10000
+        }, 50)
         firebase.database().ref('chats/' + chatId + '/chats').on('value', this.loadChats, false)
     }
     play = s => {
@@ -96,34 +125,35 @@ class Chatroom extends Component {
     }
     loadChats = s => {
         let id = this.state.chatId;
-        let data = JSON.parse(localStorage.getItem('skychatChat=' + this.props.id))
         let chats = [];
         for (let key in s.val()) {
-            chats.push({
-                ...s.val()[key],
-                key
-            })
-            if (s.val()[key].seen) {
-                if (!s.val()[key].seen[this.state.userData.uid]) {
-                    firebase.database().ref('chats/' + id + '/chats/' + key + '/seen/' + this.state.userData.uid).set(Date.now())
-                }
+            if (s.val()[key].date) {
+
+                chats.push({
+                    ...s.val()[key],
+                    key
+                })
+                if (s.val()[key].seen) {
+                    if (!s.val()[key].seen[this.state.userData.uid]) {
+                        firebase.database().ref('chats/' + id + '/chats/' + key + '/seen/' + this.state.userData.uid).set(Date.now())
+                    }
+                } else firebase.database().ref('chats/' + id + '/chats/' + key + '/seen/' + this.state.userData.uid).set(Date.now())
             }
         }
         let d = {
             chats: chats
         }
+        let data = JSON.parse(localStorage.getItem('skychatChat=' + this.props.id));
         if (data) {
             d = {
                 ...data,
                 chats: chats
             }
         }
-
         localStorage.setItem('skychatChat=' + this.props.id, JSON.stringify(d))
         this.setState({ chats: chats, chatLoaded: true });
         setTimeout(() => {
-
-            if (this.chats.current) this.chats.current.scrollTop = this.chats.current.scrollHeight + 100
+            this.chats.current.scrollTop = this.chats.current.scrollHeight + 10000
         }, 50)
     }
     send = (e, text) => {
@@ -164,32 +194,39 @@ class Chatroom extends Component {
     render() {
 
         return (
-            <div className="wrap"  >
-                <nav className="px-1 px-md-3 py-1  navbar bg-white sticky-top navbar-light  navbar-expand" >
+            <div className="wrap "  >
+                {this.state.toast && <Toast>{this.state.toast}</Toast>}
+                <nav className="px-1 px-md-3 py-1  navbar bg-white navbar-light  navbar-expand" >
                     <div className="navbar-brand  " >
-                        <button className="d-lg-none text-dark nav-link mr-2" onClick={() => Router.push('/messages')} >
+                        <button className="d-lg-none text-dark nav-link mr-2" onClick={() => Router.replace('/messages')} >
                             <i className="fa fa-arrow-left" />
                         </button>
                         <ProfilePicture online={this.state.receiver.online} src={this.state.receiver.profilePicture} size="40px" />
                     </div>
-                    <div className="info" >
-                        <h4 className="mb-0" >{this.state.isPhone ? this.state.receiver.username.substring(0, 11) : this.state.receiver.username}
-                            {this.state.receiver.username.length > 11 && '...'}
-                        </h4>
-                        <small>
-                            {this.state.receiver.online ? 'Active now' : 'Last seen ' + date(this.state.receiver.lastOnline, true)}
-                        </small>
-                    </div>
+                    <Link href='/[profile]' as={'/' + this.state.receiver.username} >
+                        <a className="info" >
+                            <h4 className="mb-0" >{this.state.isPhone ? this.state.receiver.username.substring(0, 11) : this.state.receiver.username}
+                                {this.state.receiver.username.length > 11 && '...'}
+                            </h4>
+                            <small>
+                                {this.state.receiver.online ? 'Active now' : 'Last seen ' + date(this.state.receiver.lastOnline, true)}
+                            </small>
+                        </a>
+                    </Link>
+
                     <div className="collapse navbar-collapse" >
                         <ul className="navbar-nav ml-auto" >
                             <li className="nav-item" >
-                                <Link href="#" >
-                                    <a className="nav-link" >
-                                        <i className="fa fa-cog" />
-                                    </a>
-                                </Link>
+                                <button onClick={e => this.createCall('video')} className="nav-link" >
+                                    <i className="fa fa-video" />
+                                </button>
                             </li>
                             <li className="nav-item" >
+                                <button onClick={() => this.createCall('voice')} className="nav-link" >
+                                    <i className="fa fa-phone-alt" />
+                                </button>
+                            </li>
+                            <li className="nav-item d-none d-md-block" >
                                 <Link href="#" >
                                     <a className="nav-link" >
                                         <i className="fa fa-search" />
@@ -199,29 +236,37 @@ class Chatroom extends Component {
                         </ul>
                     </div>
                 </nav>
+                <div className="split" >
+                    <div className="chats" ref={this.chats} >
+                        <div className="mx-auto flex-column align-items-center d-flex mb-3" >
+                            <ProfilePicture src={this.state.receiver.profilePicture} size='130px' online={this.state.receiver.online} />
+                            <h1 className="text-center px-2 my-2 h5 text-capitalize" >{this.state.receiver.fullName}</h1>
+                        </div>
+                        <div id='chat_watch' className="spinner" >
+                            {!this.state.chatLoaded && <div className="spinner-border" />}
+                        </div>
+                        {this.state.chats.map((cur, i) => i > this.state.count && <Chat
+                            showImg={i === 0 ? true : i === this.state.chats.length - 1 ? true : this.state.chats[i + 1].sender !== cur.sender}
+                            {...cur}
+                            receiver={{ ...this.state.receiver }} />)}
 
-                <div className="chats" ref={this.chats} >
-                    <div className="mx-auto flex-column align-items-center d-flex mb-3" >
-                        <ProfilePicture src={this.state.receiver.profilePicture} size='130px' online={this.state.receiver.online} />
-                        <h1 className="my-2 h4 text-capitalize" >{this.state.receiver.fullName}</h1>
+
                     </div>
-                    {this.state.chats.map((cur, i) => <Chat showImg={i === 0 ? true : i === this.state.chats.length - 1 ? true : this.state.chats[i + 1].sender !== cur.sender} {...cur} receiver={{ ...this.state.receiver }} />)}
-                    {!this.state.chatLoaded && <div className="spinner" >
-                        <div className="spinner-border" />
+                    {this.state.showCall && <div className="wow fadeInUp faster call" >
+                        <CallRoom setToast={this.setToast} userData={this.state.userData} receiver={{ ...this.state.receiver }} type={this.state.showCall} close={() => this.setState({ showCall: null })} />
                     </div>}
                 </div>
                 <div className="form" >
                     <Send submit={this.send} />
                 </div>
+
                 <style jsx>{`
-                         .wrap {
-                    width : 100%;
-                    height : 100%;
-                    overflow : auto;
-                    display : flex;
-                    flex-direction : column;
-                    background :var(--gray)  url(/img/chat-bg-light.jpg);
+                .wrap {
+                    display: flex;
+                    flex-direction: column;
+                    height: 100%;
                     background-size: cover;
+                    background :var(--gray);
                 }
                 .navbar-brand {
                     display : flex;
@@ -231,7 +276,7 @@ class Chatroom extends Component {
                     line-height : 1;
                 }
                 .info > h4 {
-                    font-size : 18px;
+                    font-size : 14px;
                 }
                 .info small {
                     color: var(--gray-dark);
@@ -253,42 +298,84 @@ class Chatroom extends Component {
                 .nav-link i {
                     font-size : 15px;
                 }
-            
+                .split {
+                      position: relative;
+                     z-index: 1;
+                      flex: 1 1 0;
+                      order: 2;
+                }
+                .form {
+                     flex: none;
+                     order: 3;
+                     width: 100%;
+                     min-height: 62px;
+                }
                 .chats {
                     overflow : auto;
-                    height : calc(100vh - 4rem);
                     padding : 0 10px;
-                    padding-top : calc(100vh - 30rem  );
+                    width : 100%;
+                    position : absolute;
+                    top : 0;
+                    left : 0;
+                    display : flex;
+                    flex-direction : column;
+                    height : 100%;
+                    padding-top : 5rem;
                 }
+
                 .chats::-webkit-scrollbar {
                     width : 2px;
                 }
-                .chats > * {
-                    flex-shrink : 0;
-                }
-                .form {
-                }
+
                 .spinner {
                     color : #f00;
                     text-align : center
                 }
+                .call {
+                    position : fixed ;
+                    right : 0;
+                    bottom : 0;
+                    height : 100%;
+                    background : var(--white);
+                    z-index : 1500;
+                    width : 100%;
+                }
                 @media (min-width : 1200px) {
+                    .wrap {
+                    border-left : 1px solid #ccc;
+                    }
                     .chats {
-                        padding: 10px 10%;
-                    padding-top : calc(100vh - 30rem  );
+                        padding: 10px  ${this.state.showCall ? '15px' : '10%'};
+                        left : ${this.state.showCall ? '40%' : '0'};
+                        width : ${this.state.showCall ? '60%' : '100%'};
+                        padding-top : 5rem;
                     }
                        .chats::-webkit-scrollbar {
-                    width : 8px;
+                    width : 20px;
+                }
+                .call {
+                    position : static;
+                    width : 40%;
+                    overflow : hidden;
                 }
                 }
                 `}</style>
                 <style jsx global>{`
+   
                  body.dim  .wrap {
-                    background :var(--gray)  url(/img/chat-bg-dim.jpg);
+                    background :#001119  url(/img/chat-bg-dim.jpg);
                   }
                  body.dark  .wrap {
-                    background :var(--gray)  url(/img/chat-bg-dark.jpg);
+                    background :#000  ;
                   }
+                @media (min-width : 1200px) {
+                 body.dim  .wrap {
+                    border-left : 1px solid #333;
+                 }
+                 body.dark  .wrap {
+                    border-left : 1px solid #333;
+                 }
+                }
                 `}</style>
             </div>
         )

@@ -34,21 +34,20 @@ class Profile extends React.Component {
         firebase.auth().onAuthStateChanged((user) => {
             if (user) {
                 localStorage.setItem("hasUsedSkychat", true);
-                const updatedUd = {
-                    username: user.displayName.toLowerCase(),
-                    profilePicture: user.photoURL,
-                    uid: user.uid,
-                };
-                localStorage.setItem("skychatUserData", JSON.stringify(updatedUd));
-                // fetch the profile data
-                this.setState({
-                    userData: updatedUd,
-                    loading: false,
-                });
+                firebase.database().ref('users/' + user.uid).once('value', s => {
+                    const updatedUd = {
+                        ...s.val(),
+                        uid: user.uid
+                    };
+                    localStorage.setItem("skychatUserData", JSON.stringify(updatedUd));
+                    // fetch the profile data
+                    this.setState({
+                        userData: updatedUd,
+                        loading: false,
+                    });
+                })
             } else {
-                localStorage.removeItem('skychatUserData');
-                localStorage.removeItem("skychatFeed");
-                localStorage.removeItem("hasUsedSkychat");
+                localStorage.clear()
                 this.setState({ loggedOut: true });
                 if (!this.props.stay) Router.push("/login");
             }
@@ -68,6 +67,7 @@ class Profile extends React.Component {
         return <div className="wrappers position-relative ">
             <Head>
                 <title>{this.props.title || 'Join skychat today'}</title>
+                <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
                 <meta property="og:title" content={this.props.title || 'Join Skychat Today'} />
                 <meta property="og:description" content={this.props.body || 'Join skychat today'} />
                 <link rel="shortcut icon" href="/img/logo/logo_red.png" />
@@ -103,7 +103,9 @@ class Profile extends React.Component {
                                 <li className="nav-item" >
                                     <Link href="/messages" activeClassName="active" >
                                         <a className="nav-link">
-                                            <i className="fal fa-comments"></i>
+                                            <i className="fal fa-comments">
+                                                {this.props.notProps && this.props.notProps.chats > 0 && <span className="Badge" >{this.props.notProps.chats}</span>}
+                                            </i>
                                         </a>
                                     </Link>
                                 </li>
@@ -130,14 +132,18 @@ class Profile extends React.Component {
                                 <li className="nav-item">
                                     <Link href="/messages" activeClassName="active" >
                                         <a className="nav-link">
-                                            <i className="fal fa-comments"></i>
+                                            <i className="fal fa-comments">
+                                                {this.props.notProps && this.props.notProps.chats > 0 && <span className="Badge" >{this.props.notProps.chats}</span>}
+                                            </i>
                                         </a>
                                     </Link>
                                 </li>
                                 <li className="nav-item">
                                     <Link href="/notifications" activeClassName="active" >
                                         <a className="nav-link">
-                                            <i className="fal fa-bells"></i>
+                                            <i className="fal fa-bells">
+                                                {this.props.notProps && this.props.notProps.notifications > 0 && <span className="Badge" >{this.props.notProps.notifications}</span>}
+                                            </i>
                                         </a>
                                     </Link>
                                 </li>
@@ -186,7 +192,9 @@ class Profile extends React.Component {
                             <li className="nav-item">
                                 <Link href="/notifications" activeClassName="active" >
                                     <a className="nav-link">
-                                        <i className="fal fa-bells"></i>
+                                        <i className="fal fa-bells">
+                                            {this.props.notProps && this.props.notProps.notifications > 0 && <span className="Badge" >{this.props.notProps.notifications}</span>}
+                                        </i>
                                     </a>
                                 </Link>
                             </li>
@@ -202,7 +210,7 @@ class Profile extends React.Component {
             </nav>
             <style jsx>{`
                    .wrappers {
-                        background : #f7f7f7;
+                        background : #f3f3f3;
                         padding-top : 3rem;
                         padding-bottom : 3rem;
                         transition : all .3s;
@@ -210,7 +218,7 @@ class Profile extends React.Component {
                    }
              
                    .con {
-                       max-width : 58rem;
+                       max-width :${this.props.full ? 'unset' : '55rem'};
                        margin : 0 auto;
                        min-height : 100%;
                        background : inherit;
@@ -231,6 +239,11 @@ class Profile extends React.Component {
                    .logo img {
                        height : 25px;
                    }
+                   .nav-link i{
+                       position : relative;
+                       font-size : 23px
+                   }
+
                    .comp .nav-link {
                        transition : all .3s;
                        padding : 8px 30px !important;
@@ -245,6 +258,17 @@ class Profile extends React.Component {
                          border-bottom : 2px solid #e21;
                          color : #e52 !important;
                    }
+                   .Badge {
+                       position : absolute ;
+                       top : -6px;
+                       right : -7px;
+                       border-radius : 30px;
+                       background : #f80;
+                       font-size : 11px;
+                       padding :  5px 7px;
+                       font-weight : 600;
+                       color : #fff;
+                   }
                    .phone .nav-link {
                        padding : 10px 20px !important
                     }
@@ -256,6 +280,7 @@ class Profile extends React.Component {
                        font-size : 30px;
                        color : inherit;
                    }
+                   
                    .search {
                        border-radius : 20px;
                        display : flex;
@@ -291,9 +316,10 @@ class Profile extends React.Component {
                        position : absolute ;   
                        padding :0 10px;
                        top : 0;
-                       z-index : 200;
+                       z-index : 200; 
                        left : 0;
                        align-items : center;
+                       visibility : ${this.state.showSearch ? 'visible' : 'hidden'};
                        height : calc(100% + 2px);
                        width : 100%;
                    }

@@ -26,9 +26,7 @@ export default class MayKnow extends Component {
             let friends = [];
             if (s.val()) {
                 this.setState({ loading: true })
-                for (let key in s.val()) {
-                    friends.push(s.val()[key])
-                }
+                friends = Object.values(s.val())
                 const sug = [];
                 friends.forEach((cur, index) => {
                     let fof = [];
@@ -52,12 +50,14 @@ export default class MayKnow extends Component {
                                         src: sn.val().profilePicture,
                                         online: sn.val().connections
                                     }
+
                                     sug.forEach((c, i) => {
                                         if (c.username === d.username) {
                                             sug.splice(i, 1)
                                         }
                                     })
-                                    sug.push(d);
+                                    let req = sn.val().requestsId || {};
+                                    if (!req[uid]) sug.push(d);
                                     setTimeout(() => {
 
                                         let sd = sug.reverse()

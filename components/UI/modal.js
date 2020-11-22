@@ -5,24 +5,32 @@ export default function Modal(props) {
     const router = useRouter();
 
     React.useEffect(() => {
-
+        window.location.hash = props.id || '#sky'
         router.beforePopState(cb => {
-            cancel()
-            return false
+            if (router.asPath === cb.as) {
+                cancel()
+                return false
+            } else {
+                return true
+            }
+
         })
         window.addEventListener('keyup', handleEsc, false);
         return () => window.removeEventListener('keyup', handleEsc, false);
-    }, [])
+    }, [props.id])
     const handleEsc = e => {
         if (e.keyCode === 27) cancel();
     }
     const cancel = () => {
+        let hash = window.location.hash;
+
+        hash && (router.back())
         window.removeEventListener('keyup', handleEsc, false)
         return props.cancel && props.cancel()
     }
     return <React.Fragment>
-        <div className="backdrop animated fadeIn" onClick={cancel} />
-        <div className="Modal animated fadeInUp" style={{ ...props.style }} >
+        {!props.hideBackdrop && <div className="backdrop animated fadeIn" onClick={cancel} />}
+        <div className="Modal " style={{ ...props.style }} >
             {props.children}
         </div>
         <style jsx>{`
@@ -31,14 +39,15 @@ export default function Modal(props) {
            margin : auto;
            touch-action : pinch-zoom;
            animation-duration : .5s;
-           z-index : 1500;
+           z-index : 1300;
            bottom : 0;
+           left : 50%;
+           transform: translateX(-50%)
        }
                  @media only screen and (min-width : 760px) {
                     .Modal {
                         bottom : unset;
                         top : 0;
-                        left : calc(50% - 17.5rem);
                     }
                 }
         

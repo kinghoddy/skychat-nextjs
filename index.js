@@ -2,17 +2,24 @@ import firebase from './firebase';
 import 'firebase/messaging';
 import 'firebase/database';
 import 'firebase/auth'
-import * as serviceWorker from './serviceWorker';
+// import * as serviceWorker from './serviceWorker';
 import theme from './getTheme';
+import { fetchMetaData } from './components/getLinks';
 if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/firebase-messaging-sw.js')
-        .then(function (registration) {
-            console.log('Registration successful, scope is:', registration.scope);
-        }).catch(function (err) {
-            console.log('Service worker registration failed, error:', err);
-        });
+    // navigator.serviceWorker.getRegistrations().then(function (registrations) {
+    //     console.log(registrations);
+    //     // for (let registration of registrations) {
+    //     //     registration.unregister()
+    //     // }
+    // })
+    navigator.serviceWorker.register('/firebase-messaging-sw.js').then(reg => {
+        console.log('registered service worker', reg);
+    }).catch(err => {
+        console.log('error registering sw', err);
+    });
+
 }
-serviceWorker.register();
+// serviceWorker.register();
 firebase.auth().onAuthStateChanged(user => {
     if (user) {
         firebase.database().ref('users/' + user.uid).once('value', s => {
@@ -68,5 +75,11 @@ const checkConnection = (user) => {
         }
     });
 }
+
+const d = document.createElement('div')
+d.innerHTML = '<a href="https://google.com">google</a>'
+const meta = fetchMetaData(d);
+console.log(meta, 'google.com');
+
 
 theme.getTheme()

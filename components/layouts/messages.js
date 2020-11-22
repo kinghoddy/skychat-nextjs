@@ -3,7 +3,6 @@ import Head from 'next/head';
 import firebase from '../../firebase';
 import 'firebase/auth';
 import 'firebase/database';
-import Link from '../UI/Link/link';
 import RouterLoader from '../UI/routerLoader';
 import Router from 'next/router'
 import Chats from '../messages/chats';
@@ -32,16 +31,21 @@ class Message extends React.Component {
         firebase.auth().onAuthStateChanged((user) => {
             if (user) {
                 localStorage.setItem("hasUsedSkychat", true);
-                const updatedUd = {
-                    username: user.displayName.toLowerCase(),
-                    profilePicture: user.photoURL,
-                    uid: user.uid,
-                };
-                localStorage.setItem("skychatUserData", JSON.stringify(updatedUd));
-                // fetch the profile data
-                this.setState({
-                    userData: updatedUd,
-                    loading: false,
+                firebase.database().ref('users/' + user.uid).once('value', s => {
+
+                    const updatedUd = {
+                        username: s.val().username,
+                        profilePicture: s.val().profilePicture,
+                        coverPhoto: s.val().coverPhoto,
+                        fullName: s.val().fullName,
+                        uid: user.uid
+                    };
+                    localStorage.setItem("skychatUserData", JSON.stringify(updatedUd));
+                    // fetch the profile data
+                    this.setState({
+                        userData: updatedUd,
+                        loading: false,
+                    })
                 });
             } else {
                 localStorage.removeItem('skychatUserData');
@@ -63,11 +67,12 @@ class Message extends React.Component {
                 <meta property="og:image" content={this.props.src ? this.props.src : "/img/logo/logo_blue.png"} />
             </Head>
             <RouterLoader noShow />
+
             <div className="row no-gutters h-100 " >
-                <div className="col chat h-100">
+                <div className=" chat h-100">
                     <Chats {...this.state.userData} />
                 </div>
-                <div className={" chatroom col h-100 " + (this.props.chatting ? 'chatting' : '')} >
+                <div className={" chatroom " + (this.props.chatting ? 'chatting' : '')} >
                     {this.props.children}
                 </div>
             </div>
@@ -81,7 +86,8 @@ class Message extends React.Component {
                        width : 100vw
                    }
                    .chatroom {
-                       display : none
+                       display : none;
+                       flex  : 1;
                    }
           
                    .chatting {
@@ -89,19 +95,21 @@ class Message extends React.Component {
                        bottom : 0;
                        left :0;
                        width : 100vw;
+                       height : 100%;
                        display : block;
-                       z-index : 2000;
+                       z-index : 1300;
                    }
                    @media (min-width : 1200px) {
                        .chat {
-                           flex : 0 0 30%;
+                           flex : 0 0 27%;
                            width : 30vw
                        }
                        .chatroom {
                            display : block;
                        }
                        .chatting {
-                           position : static
+                           position : static;
+                           z-index : 1;
                        }
                    }
                 `}</style>

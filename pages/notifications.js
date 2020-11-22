@@ -4,7 +4,7 @@ import NotPage from '../components/notification/notPage';
 
 export default class Nots extends React.Component {
     render() {
-        return <Layout title="Notifications">
+        return <Layout title="Notifications" notProps={this.props.notProps} >
             <div className="con py-lg-3" >
                 <div className=" sh">
 

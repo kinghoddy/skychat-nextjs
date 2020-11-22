@@ -1,0 +1,22 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.kinghoddy.skychatlite",
+      "sha256_cert_fingerprints": [
+        " 21:CD:22:90:87:86:CC:BF:1C:9D:74:7D:59:B0:2E:C1:36:F7:00:64:7A:BB:11:A9:CC:32:FB:4B:18:56:19:E3"
+      ]
+    }
+  },
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.kinghoddy.skychat",
+      "sha256_cert_fingerprints": [
+        " 21:CD:22:90:87:86:CC:BF:1C:9D:74:7D:59:B0:2E:C1:36:F7:00:64:7A:BB:11:A9:CC:32:FB:4B:18:56:19:E3"
+      ]
+    }
+  }
+]
