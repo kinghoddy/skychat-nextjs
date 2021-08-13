@@ -15,7 +15,7 @@
     "firebase": "^7.22.0",
     "globby": "^11.0.1",
     "jquery": "^3.5.1",
-    "next": "^9.5.5",
+    "next": "^11.1.0",
     "react": "16.13.1",
     "react-dom": "16.13.1",
     "react-flip-move": "^3.0.4",
